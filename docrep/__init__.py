@@ -4,7 +4,7 @@ import re
 from warnings import warn
 
 
-__version__ = '0.0.0.dev1'
+__version__ = '0.1.0'
 
 __author__ = 'Philipp Sommer'
 
@@ -33,13 +33,13 @@ def safe_modulo(s, meta, checked='', print_warning=True):
     ----------
     s: str
         string to apply the modulo operation with
-    meta: dict
-        meta informations to insert
+    meta: dict or tuple
+        meta informations to insert (usually via ``s % meta``)
     checked: {'KEY', 'VALUE'}, optional
         Security parameter for the recursive structure of this function. It can
         be set to 'VALUE' if an error shall be raised when facing a TypeError
         or ValueError or to 'KEY' if an error shall be raised when facing a
-        KeyError
+        KeyError. This parameter is mainly for internal processes.
     print_warning: bool
         If True and a key is not existent in `s`, a warning is raised
 
@@ -52,7 +52,7 @@ def safe_modulo(s, meta, checked='', print_warning=True):
         >>> s = "That's %(one)s string %(with)s missing 'with' and %s key"
         >>> s % {'one': 1}
         # raises KeyError because of missing 'with'
-        >>> s% {'one': 1, 'with': 2}
+        >>> s % {'one': 1, 'with': 2}
         # raises TypeError because of '%s'
         >>> safe_modulo(s, {'one': 1})
         "That's 1 string %(with)s missing 'with' and %s key"
@@ -108,7 +108,8 @@ class DocstringProcessor(object):
     others) form the docstring for later usage (and make sure, that the
     docstring is dedented)::
 
-        >>> @d.get_sectionsf('docstring_example')
+        >>> @d.get_sectionsf('docstring_example',
+        ...                  sections=['Parameters', 'Examples'])
         ... @d.dedent
         ... def doc_test(a=1, b=2):
         ...     '''
@@ -127,7 +128,7 @@ class DocstringProcessor(object):
         ...     print(a)
 
         >>> @docstrings.dedent
-        ... def second_test(a=1):
+        ... def second_test(a=1, b=2):
         ...     '''
         ...     My second function where I want to use the docstring from
         ...     above

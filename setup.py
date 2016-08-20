@@ -11,11 +11,11 @@ def readme():
 
 
 setup(name='docrep',
-      version='0.0.0.dev1',
-      description='Python package for docsting repetition',
+      version='0.1.0',
+      description='Python package for docstring repetition',
       long_description=readme(),
       classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Topic :: Documentation',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
@@ -26,7 +26,7 @@ setup(name='docrep',
         'Programming Language :: Python :: 3.5',
         'Operating System :: OS Independent',
       ],
-      keywords='docstrings docs docstring napoleon numpy',
+      keywords='docstrings docs docstring napoleon numpy reStructured text',
       url='https://github.com/Chilipp/docrep',
       author='Philipp Sommer',
       author_email='philipp.sommer@unil.ch',
