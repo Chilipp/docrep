@@ -1,0 +1,6 @@
+name: docrep_docs
+channels:
+    - chilipp
+dependencies:
+    - psyplot
+    - sphinx
