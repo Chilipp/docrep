@@ -49,7 +49,7 @@ to create a well-documented software.
 
 See the `documentation on readthedocs`_ for a small tutorial.
 
-.. _documentation: http://docrep.readthedocs.io/en/latest/
+.. _documentation on readthedocs: http://docrep.readthedocs.io/en/latest/
 
 Installation
 ------------
