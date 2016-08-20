@@ -4,7 +4,7 @@ import re
 from warnings import warn
 
 
-__version__ = '0.0.0dev0'
+__version__ = '0.0.0.dev1'
 
 __author__ = 'Philipp Sommer'
 

@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='docrep',
-      version='0.0.0dev0',
+      version='0.0.0.dev1',
       description='Python package for docsting repetition',
       long_description=readme(),
       classifiers=[
