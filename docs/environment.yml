@@ -3,4 +3,5 @@ channels:
     - chilipp
 dependencies:
     - psyplot
+    - ipython
     - sphinx
