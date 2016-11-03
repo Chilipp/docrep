@@ -1,0 +1,6 @@
+name: docrep_docs
+dependencies:
+    - matplotlib
+    - ipython
+    - pip:
+        - autodocsumm
