@@ -39,9 +39,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
-    'psyplot.sphinxext.extended_napoleon',
-    'psyplot.sphinxext.no_data',
-    'psyplot.sphinxext.extended_autodoc',
+    'autodocsumm',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
