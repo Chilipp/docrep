@@ -3,6 +3,6 @@ dependencies:
     - matplotlib
     - ipython
     - jupyter_client
-    - sphinx
+    - sphinx=1.3  # with 1.4 singlehtml doesn't work
     - pip:
         - autodocsumm
