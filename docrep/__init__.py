@@ -26,7 +26,7 @@ substitution_pattern = re.compile(
 summary_patt = re.compile(r'(?s).*?(?=(\n\n)|$)')
 
 
-def safe_modulo(s, meta, checked='', print_warning=True):
+def safe_modulo(s, meta, checked='', print_warning=True, stacklevel=2):
     """Safe version of the modulo operation (%) of strings
 
     Parameters
@@ -42,6 +42,8 @@ def safe_modulo(s, meta, checked='', print_warning=True):
         KeyError. This parameter is mainly for internal processes.
     print_warning: bool
         If True and a key is not existent in `s`, a warning is raised
+    stacklevel: int
+        The stacklevel for the :func:`warnings.warn` function
 
 
     Examples
@@ -66,19 +68,21 @@ def safe_modulo(s, meta, checked='', print_warning=True):
             key = m.group('key')
             if not isinstance(meta, dict) or key not in meta:
                 if print_warning:
-                    warn("%r is not a valid key!" % key, SyntaxWarning)
+                    warn("%r is not a valid key!" % key, SyntaxWarning,
+                         stacklevel)
                 full = m.group()
                 s = s.replace(full, '%' + full)
         if 'KEY' not in checked:
             return safe_modulo(s, meta, checked=checked + 'KEY',
-                               print_warning=print_warning)
+                               print_warning=print_warning,
+                               stacklevel=stacklevel)
         if not isinstance(meta, dict) or 'VALUE' in checked:
             raise
         s = re.sub(r"""(?<!%)(%%)*%(?!%) # uneven number of %
                     \s*(\w|$)         # format strings""", '%\g<0>', s,
                    flags=re.VERBOSE)
         return safe_modulo(s, meta, checked=checked + 'VALUE',
-                           print_warning=print_warning)
+                           print_warning=print_warning, stacklevel=stacklevel)
 
 
 class DocstringProcessor(object):
@@ -202,7 +206,8 @@ class DocstringProcessor(object):
         self.patterns = patterns
 
     def __call__(self, func):
-        func.__doc__ = func.__doc__ and safe_modulo(func.__doc__, self.params)
+        func.__doc__ = func.__doc__ and safe_modulo(func.__doc__, self.params,
+                                                    stacklevel=3)
         return func
 
     def get_sections(self, s, base,
@@ -223,6 +228,11 @@ class DocstringProcessor(object):
             sections to look for. Each section must be followed by a newline
             character ('\\n') and a bar of '-' (following the numpy (napoleon)
             docstring conventions).
+
+        Returns
+        -------
+        str
+            The replaced string
 
         References
         ----------
@@ -279,10 +289,11 @@ class DocstringProcessor(object):
             shall be inserted from the :attr:`params` attribute"""
         if isinstance(func, types.MethodType) and not six.PY3:
             func = func.im_func
-        func.__doc__ = func.__doc__ and dedents(func.__doc__)
-        return self(func)
+        func.__doc__ = func.__doc__ and self.dedents(func.__doc__,
+                                                     stacklevel=4)
+        return func
 
-    def dedents(self, s):
+    def dedents(self, s, stacklevel=3):
         """
         Dedent a string and substitute with the :attr:`params` attribute
 
@@ -290,9 +301,12 @@ class DocstringProcessor(object):
         ----------
         s: str
             string to dedent and insert the sections of the :attr:`params`
-            attribute"""
+            attribute
+        stacklevel: int
+            The stacklevel for the warning raised in :func:`safe_module` when
+            encountering an invalid key in the string"""
         s = dedents(s)
-        return safe_modulo(s, self.params)
+        return safe_modulo(s, self.params, stacklevel=stacklevel)
 
     def delete_params(self, base_key, *params):
         """
