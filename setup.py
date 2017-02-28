@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='docrep',
-      version='0.1.1',
+      version='0.1.2',
       description='Python package for docstring repetition',
       long_description=readme(),
       classifiers=[
@@ -35,6 +35,7 @@ setup(name='docrep',
       install_requires=[
           'six',
       ],
+      data_files = [("", ["LICENSE"])],
       setup_requires=pytest_runner,
       tests_require=['pytest'],
       zip_safe=False)
