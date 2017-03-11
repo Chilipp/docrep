@@ -44,8 +44,8 @@ docrep - A Python Module for intelligent reuse of docstrings
 What's this?
 ------------
 Welcome to the **doc**\ umentation **rep**\ etition module **docrep**! This
-module developpers that develop complex and nested Python APIs and helps them
-to create a well-documented software.
+module targets developers that develop complex and nested Python APIs and
+helps them to create a well-documented piece of software.
 
 See the `documentation on readthedocs`_ for a small tutorial.
 
