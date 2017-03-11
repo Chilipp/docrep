@@ -4,12 +4,13 @@
 A Python Module for intelligent reuse of docstrings
 ===================================================
 
+.. although this is a circular reference, we include the index here to make singlehtml working
+
 
 .. toctree::
     :maxdepth: 1
-    :hidden:
 
-    dummy
+    index
 
 
 .. list-table::
