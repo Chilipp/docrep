@@ -7,6 +7,9 @@ A Python Module for intelligent reuse of docstrings
 
 .. toctree::
     :maxdepth: 1
+    :hidden:
+
+    dummy
 
 
 .. list-table::
