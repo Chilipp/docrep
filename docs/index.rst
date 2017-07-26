@@ -12,7 +12,7 @@ A Python Module for intelligent reuse of docstrings
 
     index
 
-.. only:: html
+.. only:: html and not epub
 
     .. list-table::
         :stub-columns: 1
