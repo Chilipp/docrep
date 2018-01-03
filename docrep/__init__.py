@@ -252,12 +252,10 @@ class DocstringProcessor(object):
         if not sections_patt.match(s):
             # remove the summary
             lines = summary_patt.sub('', s, 1).splitlines()
-            print(lines)
             # look for the first line with content
             first = next((i for i, l in enumerate(lines) if l.strip()), 0)
             # dedent the lines
             s = dedents('\n' + '\n'.join(lines[first:]))
-        print(s)
         for section in sections:
             key = '%s.%s' % (base, section.lower().replace(' ', '_'))
             params[key] = self._get_section(s, section)
