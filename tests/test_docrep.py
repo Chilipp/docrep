@@ -171,8 +171,15 @@ class TestDocstringProcessor(_BaseTest):
     def tearDown(self):
         del self.ds
 
-    def test_get_sectionsf(self):
+    def test_get_sectionsf(self, indented=False):
         """Test whether the parameter sections are extracted correctly"""
+        if indented:
+            def indent(s):
+                return ' ' * 4 + ('\n' + ' ' * 4).join(s.splitlines())
+        else:
+            def indent(s):
+                return s
+
         self.params_section = ps = simple_param + '\n' + complex_param
         self.other_params_section = ops = (
             simple_multiline_param + '\n' + very_complex_param)
@@ -183,14 +190,14 @@ class TestDocstringProcessor(_BaseTest):
             pass
 
         test.__doc__ = (
-            summary + '\n\n' +
-            random_text + '\n\n' +
-            parameters_header + '\n' + ps + '\n\n' +
-            other_parameters_header + '\n' + ops + '\n\n' +
-            returns_header + '\n' + rs + '\n\n' +
-            examples_header + '\n' + examples + '\n\n' +
-            notes_header + '\n' + notes + '\n\n' +
-            see_also_header + '\n' + see_also)
+            summary + '\n\n' + indent(
+                random_text + '\n\n' +
+                parameters_header + '\n' + ps + '\n\n' +
+                other_parameters_header + '\n' + ops + '\n\n' +
+                returns_header + '\n' + rs + '\n\n' +
+                examples_header + '\n' + examples + '\n\n' +
+                notes_header + '\n' + notes + '\n\n' +
+                see_also_header + '\n' + see_also))
         base = 'test'
 
         decorator = self.ds.get_sectionsf(
@@ -207,6 +214,9 @@ class TestDocstringProcessor(_BaseTest):
         self.assertEqual(ds.params[base + '.notes'], notes)
         self.assertEqual(ds.params[base + '.see_also'], see_also)
         self.assertEqual(ds.params[base + '.references'], '')
+
+    def test_get_sectionsf_indented(self):
+        self.test_get_sectionsf(indented=True)
 
     def test_dedent(self):
         self.test_get_sectionsf()
