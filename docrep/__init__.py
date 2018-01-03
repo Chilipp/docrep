@@ -194,7 +194,7 @@ class DocstringProcessor(object):
         all_sections = self.param_like_sections + self.text_sections
         for section in self.param_like_sections:
             patterns[section] = re.compile(
-                '(?:\s*%s\n\s*%s\n)(?s)(.+?)(?=\n\n\S+|$)' % (
+                '(?:\s*%s\n\s*%s\n)(?s)(.+?)(?=\n\n.+|$)' % (
                     section, '-'*len(section)))
         all_sections_patt = '|'.join(
             '%s\n%s\n' % (s, '-'*len(s)) for s in all_sections)
@@ -253,7 +253,7 @@ class DocstringProcessor(object):
 
     def _get_section(self, s, section):
         try:
-            return self.patterns[section].search(s).group(1).rstrip()
+            return self.patterns[section].search(s).group(1).strip()
         except AttributeError:
             return ''
 
