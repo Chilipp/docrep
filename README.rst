@@ -57,8 +57,13 @@ Installation simply goes via pip::
 
     $ pip install docrep
 
+or via conda_::
+
+    $ conda install -c conda-forge docrep
+
 or from the source on github_ via::
 
     $ python setup.py install
 
+.. _conda: https://conda.io/docs/
 .. _github: https://github.com/Chilipp/docrep
