@@ -28,9 +28,9 @@ docrep - A Python Module for intelligent reuse of docstrings
     :alt: PyPI Package latest release
     :target: https://pypi.python.org/pypi/docrep
 
-.. |conda| image:: https://anaconda.org/chilipp/docrep/badges/installer/conda.svg
+.. |conda| image:: https://anaconda.org/conda-forge/docrep/badges/installer/conda.svg
     :alt: conda
-    :target: https://conda.anaconda.org/chilipp
+    :target: https://anaconda.org/conda-forge/docrep
 
 .. |supported-versions| image:: https://img.shields.io/pypi/pyversions/docrep.svg?style=flat
     :alt: Supported versions
