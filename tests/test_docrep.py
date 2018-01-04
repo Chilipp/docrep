@@ -245,6 +245,36 @@ class TestDocstringProcessor(_BaseTest):
 
         self.assertEqual(test2.__doc__, ref)
 
+    def test_with_indent(self):
+        self.test_get_sectionsf_indented()
+
+        with self.assertWarns(SyntaxWarning):
+            @self.ds.with_indent(16)
+            def test2():
+                """A test function with used docstring from another
+
+                Parameters
+                ----------
+                %(test.parameters)s
+                %(missing)s
+
+                Examples
+                --------
+                %(test.examples)s"""
+
+        ref = ("A test function with used docstring from another\n"
+               "\n"
+               "Parameters\n"
+               "----------\n" +
+               self.params_section + '\n%(missing)s\n\n' +
+               examples_header + '\n' + examples)
+
+        ref = '\n'.join(' ' * 16 + l if l.strip() and i else l
+                        for i, l in enumerate(ref.splitlines()))
+
+        s = '\n'.join(l.rstrip() for l in test2.__doc__.splitlines())
+        self.assertEqual(s, ref)
+
     def test_dedents(self):
         self.test_get_sectionsf()
         s = """

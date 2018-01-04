@@ -118,7 +118,7 @@ not even care about ``a`` anymore. So we could even say
 because we only care about the result from ``do_something``. However, if we
 want to change something in the parameters documentation of ``do_something``,
 we would have to change it in ``do_more``. This can become a severe error
-source large and complex APIs!
+source in large and complex APIs!
 
 So instead of copy-and-pasting the entire documentation of ``do_something``, we
 want to automatically repeat the given docstrings and that's what this module
@@ -162,7 +162,7 @@ is intended for. Hence, The code above could be rewritten via
        ...:     -------
        ...:     int
        ...:         (`a` + `b`) * 2"""
-       ...:     return do_something(a, b) * 2
+       ...:     return do_something(*args, **kwargs) * 2
 
     In [8]: help(do_more)
 
@@ -172,9 +172,46 @@ can even remove or keep only specific parameters or return types (see
 :meth:`~DocstringProcessor.delete_params`). The module intensively uses pythons
 :mod:`re` module so it is very efficient. The only restriction is, that your
 Python code has to be documented following the `numpy conventions`_ (i.e. it
-should follow the conventions from the sphinx napoleon extension). Furthermore
-your docstrings must be :meth:`dedented <DocstringProcessor.dedent>` in order
-to get the sections from them.
+should follow the conventions from the sphinx napoleon extension).
+
+If your docstring does not start with an empty line as in the example above,
+you have to use the :meth:`DocstringProcessor.with_indent` method. See for
+example
+
+.. ipython::
+
+    In [9]: @docstrings.get_sectionsf('do_something')
+       ...: def second_example_source(a, b):
+       ...:     """Summary is on the first line
+       ...:
+       ...:     Parameters
+       ...:     ----------
+       ...:     a: int
+       ...:         The first number
+       ...:     b: int
+       ...:         The second number
+       ...:
+       ...:     Returns
+       ...:     -------
+       ...:     int
+       ...:         `a` + `b`"""
+       ...:     return a + b
+
+    In [10]: @docstrings.with_indent(4)  # we indent the replacements with 4 spaces
+       ....: def second_example_target(*args, **kwargs):
+       ....:     """Target docstring with summary on the first line
+       ....:
+       ....:     Parameters
+       ....:     ----------
+       ....:     %(do_something.parameters)s
+       ....:
+       ....:     Returns
+       ....:     -------
+       ....:     int
+       ....:         (`a` + `b`) * 2"""
+       ....:     return second_example_source(*args, **kargs) * 2
+
+    In [11]: help(second_example_target)
 
 .. _`numpy conventions`: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
 
@@ -185,7 +222,7 @@ Installation simply goes via pip::
 
     $ pip install docrep
 
-or from the source on github_ via
+or from the source on github_ via::
 
     $ python setup.py install
 

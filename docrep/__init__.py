@@ -4,7 +4,7 @@ import re
 from warnings import warn
 
 
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 
 __author__ = 'Philipp Sommer'
 
@@ -24,6 +24,21 @@ substitution_pattern = re.compile(
 
 
 summary_patt = re.compile(r'(?s).*?(?=(\n\s*\n)|$)')
+
+
+class _StrWithIndentation(object):
+    """A convenience class that indents the given string if requested through
+    the __str__ method"""
+
+    def __init__(self, s, indent=0, *args, **kwargs):
+        self._indent = '\n' + ' ' * indent
+        self._s = s
+
+    def __str__(self):
+        return self._indent.join(self._s.splitlines())
+
+    def __repr__(self):
+        return repr(self._indent.join(self._s.splitlines()))
 
 
 def safe_modulo(s, meta, checked='', print_warning=True, stacklevel=2):
@@ -131,7 +146,7 @@ class DocstringProcessor(object):
         ...     Some dummy example doc'''
         ...     print(a)
 
-        >>> @docstrings.dedent
+        >>> @d.dedent
         ... def second_test(a=1, b=2):
         ...     '''
         ...     My second function where I want to use the docstring from
@@ -160,6 +175,34 @@ class DocstringProcessor(object):
         Examples
         --------
         Some dummy example doc
+
+    Another example uses non-dedented docstrings::
+
+        >>> @d.get_sectionsf('not_dedented')
+        ... def doc_test2(a=1):
+        ...     '''That's the summary
+        ...
+        ...     Parameters
+        ...     ----------
+        ...     a: int, optional
+        ...         A dummy parameter description'''
+        ...     print(a)
+
+    These sections must then be used with the :meth:`with_indent` method to
+    indent the inserted parameters::
+
+        >>> @d.with_indent(4)
+        ... def second_test2(a=1):
+        ...     '''
+        ...     My second function where I want to use the docstring from
+        ...     above
+        ...
+        ...     Parameters
+        ...     ----------
+        ...     %(not_dedented.parameters)s'''
+        ...     pass
+
+
     """
 
     #: :class:`dict`. Dictionary containing the compiled patterns to identify
@@ -175,7 +218,7 @@ class DocstringProcessor(object):
     #: list
     param_like_sections = ['Parameters', 'Other Parameters', 'Returns',
                            'Raises']
-    #: sections that include (possibly unintended) text
+    #: sections that include (possibly not list-like) text
     text_sections = ['Warnings', 'Notes', 'Examples', 'See Also',
                      'References']
 
@@ -317,6 +360,22 @@ class DocstringProcessor(object):
             encountering an invalid key in the string"""
         s = dedents(s)
         return safe_modulo(s, self.params, stacklevel=stacklevel)
+
+    def with_indent(self, indent=0):
+        def replace(func):
+            if isinstance(func, types.MethodType) and not six.PY3:
+                func = func.im_func
+            func.__doc__ = func.__doc__ and self.with_indents(
+                func.__doc__, indent=indent, stacklevel=4)
+            return func
+        return replace
+
+    def with_indents(self, s, indent=0, stacklevel=3):
+        # we make a new dictionary with objects that indent the original
+        # strings if necessary. Note that the first line is not indented
+        d = {key: _StrWithIndentation(val, indent)
+             for key, val in six.iteritems(self.params)}
+        return safe_modulo(s, d, stacklevel=stacklevel)
 
     def delete_params(self, base_key, *params):
         """
