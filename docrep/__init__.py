@@ -23,7 +23,7 @@ substitution_pattern = re.compile(
         \((?P<key>(?s).*?)\)# key enclosed in brackets""", re.VERBOSE)
 
 
-summary_patt = re.compile(r'(?s).*?(?=(\n\n)|$)')
+summary_patt = re.compile(r'(?s).*?(?=(\n\s*\n)|$)')
 
 
 def safe_modulo(s, meta, checked='', print_warning=True, stacklevel=2):
@@ -246,6 +246,16 @@ class DocstringProcessor(object):
             for saving an entire docstring
         """
         params = self.params
+        sections_patt = re.compile('|'.join(sections) + '(?=\n\s*-)')
+        # if the string does not start with one of the sections, we remove the
+        # summary
+        if not sections_patt.match(s):
+            # remove the summary
+            lines = summary_patt.sub('', s, 1).splitlines()
+            # look for the first line with content
+            first = next((i for i, l in enumerate(lines) if l.strip()), 0)
+            # dedent the lines
+            s = dedents('\n' + '\n'.join(lines[first:]))
         for section in sections:
             key = '%s.%s' % (base, section.lower().replace(' ', '_'))
             params[key] = self._get_section(s, section)
