@@ -2,7 +2,7 @@
 .. currentmodule:: docrep
 
 A Python Module for intelligent reuse of docstrings
-===================================================
+***************************************************
 
 .. although this is a circular reference, we include the index here to make singlehtml working
 
@@ -55,7 +55,7 @@ A Python Module for intelligent reuse of docstrings
 
 
 What's this?
-------------
+============
 Welcome to the **doc**\ umentation **rep**\ etition module **docrep**! This
 module targets developers that develop complex and nested Python APIs and
 helps them to create a well-documented piece of software.
@@ -217,7 +217,7 @@ example
 
 
 Installation
-------------
+=============
 Installation simply goes via pip::
 
     $ pip install docrep
@@ -229,18 +229,23 @@ or from the source on github_ via::
 .. _github: https://github.com/Chilipp/docrep
 
 
-Documentation
--------------
+API Reference
+=============
 
 .. automodule:: docrep
     :members:
     :undoc-members:
     :show-inheritance:
 
+.. _changelog:
 
+Changelog
+*********
+
+.. include:: ../CHANGELOG.rst
 
 Indices and tables
-==================
+******************
 
 * :ref:`genindex`
 * :ref:`modindex`
