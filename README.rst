@@ -57,7 +57,7 @@ Installation simply goes via pip::
 
     $ pip install docrep
 
-or from the source on github_ via
+or from the source on github_ via::
 
     $ python setup.py install
 
