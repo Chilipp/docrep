@@ -292,7 +292,7 @@ class DocstringProcessor(object):
         sections_patt = re.compile('|'.join(sections) + '(?=\n\s*-)')
         # if the string does not start with one of the sections, we remove the
         # summary
-        if not sections_patt.match(s):
+        if not sections_patt.match(s.lstrip()):
             # remove the summary
             lines = summary_patt.sub('', s, 1).splitlines()
             # look for the first line with content
