@@ -1,3 +1,9 @@
+v0.2.1
+======
+Changed
+-------
+* Minor bug fix in the get_sections method
+
 v0.2.0
 ======
 Added
