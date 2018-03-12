@@ -421,8 +421,8 @@ class DocstringProcessor(object):
         str
             The modified string `s` without the descriptions of `params`
         """
-        patt = '|'.join(
-            '(?<=\n)' + s + '\s*:(?s).+?\n(?=\S+|$)' for s in params)
+        patt = '(?s)' + '|'.join(
+            '(?<=\n)' + s + '\s*:.+?\n(?=\S+|$)' for s in params)
         return re.sub(patt, '', '\n' + s.strip() + '\n').strip()
 
     def delete_kwargs(self, base_key, args=None, kwargs=None):
@@ -538,7 +538,8 @@ class DocstringProcessor(object):
         str
             The modified string `s` without the descriptions of `types`
         """
-        patt = '|'.join('(?<=\n)' + s + '\n(?s).+?\n(?=\S+|$)' for s in types)
+        patt = '(?s)' + '|'.join(
+            '(?<=\n)' + s + '\n.+?\n(?=\S+|$)' for s in types)
         return re.sub(patt, '', '\n' + s.strip() + '\n',).strip()
 
     def keep_params(self, base_key, *params):
@@ -584,8 +585,8 @@ class DocstringProcessor(object):
         str
             The modified string `s` with only the descriptions of `params`
         """
-        patt = '|'.join(
-            '(?<=\n)' + s + '\s*:(?s).+?\n(?=\S+|$)' for s in params)
+        patt = '(?s)' + '|'.join(
+            '(?<=\n)' + s + '\s*:.+?\n(?=\S+|$)' for s in params)
         return ''.join(re.findall(patt, '\n' + s.strip() + '\n')).rstrip()
 
     def keep_types(self, base_key, out_key, *types):
