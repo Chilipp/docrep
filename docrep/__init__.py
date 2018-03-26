@@ -760,7 +760,7 @@ class DocstringProcessor(object):
 
         This here and the line above is the full description (i.e. the
         combination of the :meth:`get_summary` and the
-        :meth:`get_full_description`) output
+        :meth:`get_extended_summary`) output
 
         Parameters
         ----------
