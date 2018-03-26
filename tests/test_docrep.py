@@ -337,6 +337,63 @@ class TestDocstringProcessor(_BaseTest):
         self.ds.get_summaryf('test3')(test_summary_only)
         self.assertEqual(self.ds.params['test3.summary'], summary)
 
+    def test_get_extended_summary(self):
+        """Test whether the extended summary is extracted correctly"""
+
+        doc = (
+            random_text + '\n\n' + parameters_header + '\n' + complex_param)
+
+        def test_basic():
+            pass
+        test_basic.__doc__ = summary + '\n\n' + doc
+
+        self.ds.get_extended_summaryf('test1')(test_basic)
+        self.assertEqual(self.ds.params['test1.summary_ext'],
+                         random_text.strip())
+
+        def test_no_extended_summary():
+            pass
+        test_no_extended_summary.__doc__ = doc
+
+        self.ds.get_extended_summaryf('test2')(test_no_extended_summary)
+        self.assertEqual(self.ds.params['test2.summary_ext'], '')
+
+        def test_no_params():
+            pass
+        test_no_params.__doc__ = summary + '\n\n' + random_text
+        self.ds.get_extended_summaryf('test3')(test_no_params)
+        self.assertEqual(self.ds.params['test3.summary_ext'],
+                         random_text.strip())
+
+    def test_get_full_description(self):
+        """Test whether the full description is extracted correctly"""
+
+        doc = (
+            random_text + '\n\n' + parameters_header + '\n' + complex_param)
+
+        def test_basic():
+            pass
+        test_basic.__doc__ = summary + '\n\n' + doc
+
+        self.ds.get_full_descriptionf('test1')(test_basic)
+        self.assertEqual(self.ds.params['test1.full_desc'],
+                         summary + '\n\n' + random_text.strip())
+
+        def test_no_extended_summary():
+            pass
+        test_no_extended_summary.__doc__ = doc
+
+        self.ds.get_full_descriptionf('test2')(test_no_extended_summary)
+        self.assertEqual(self.ds.params['test2.full_desc'],
+                         random_text.strip())
+
+        def test_no_params():
+            pass
+        test_no_params.__doc__ = summary + '\n\n' + random_text
+        self.ds.get_full_descriptionf('test3')(test_no_params)
+        self.assertEqual(self.ds.params['test3.full_desc'],
+                         summary + '\n\n' + random_text.strip())
+
     # -------------------------------------------------------------------------
     # ------------------------------ Keep tests -------------------------------
     # -------------------------------------------------------------------------

@@ -4,7 +4,7 @@ import re
 from warnings import warn
 
 
-__version__ = '0.2.1.post1'
+__version__ = '0.2.2'
 
 __author__ = 'Philipp Sommer'
 
@@ -237,15 +237,18 @@ class DocstringProcessor(object):
         all_sections = self.param_like_sections + self.text_sections
         for section in self.param_like_sections:
             patterns[section] = re.compile(
-                '(?<=%s\n%s\n)(?s)(.+?)(?=\n\n\S+|$)' % (
+                '(?s)(?<=%s\n%s\n)(.+?)(?=\n\n\S+|$)' % (
                     section, '-'*len(section)))
         all_sections_patt = '|'.join(
             '%s\n%s\n' % (s, '-'*len(s)) for s in all_sections)
         # examples and see also
         for section in self.text_sections:
             patterns[section] = re.compile(
-                '(?<=%s\n%s\n)(?s)(.+?)(?=%s|$)' % (
+                '(?s)(?<=%s\n%s\n)(.+?)(?=%s|$)' % (
                     section, '-'*len(section), all_sections_patt))
+        self._extended_summary_patt = re.compile(
+            '(?s)(.+?)(?=%s|$)' % all_sections_patt)
+        self._all_sections_patt = re.compile(all_sections_patt)
         self.patterns = patterns
 
     def __call__(self, func):
@@ -289,19 +292,23 @@ class DocstringProcessor(object):
             for saving an entire docstring
         """
         params = self.params
-        sections_patt = re.compile('|'.join(sections) + '(?=\n\s*-)')
+        # Remove the summary and dedent the rest
+        s = self._remove_summary(s)
+        for section in sections:
+            key = '%s.%s' % (base, section.lower().replace(' ', '_'))
+            params[key] = self._get_section(s, section)
+        return s
+
+    def _remove_summary(self, s):
         # if the string does not start with one of the sections, we remove the
         # summary
-        if not sections_patt.match(s.lstrip()):
+        if not self._all_sections_patt.match(s.lstrip()):
             # remove the summary
             lines = summary_patt.sub('', s, 1).splitlines()
             # look for the first line with content
             first = next((i for i, l in enumerate(lines) if l.strip()), 0)
             # dedent the lines
             s = dedents('\n' + '\n'.join(lines[first:]))
-        for section in sections:
-            key = '%s.%s' % (base, section.lower().replace(' ', '_'))
-            params[key] = self._get_section(s, section)
         return s
 
     def _get_section(self, s, section):
@@ -651,7 +658,7 @@ class DocstringProcessor(object):
 
     def get_summary(self, s, base=None):
         """
-        Get the summary of the given docstring s
+        Get the summary of the given docstring
 
         This method extracts the summary from the given docstring `s` which is
         basicly the part until two newlines appear
@@ -676,7 +683,7 @@ class DocstringProcessor(object):
 
     def get_summaryf(self, *args, **kwargs):
         """
-        Decorator method to extract summary from a function docstring
+        Extract the summary from a function docstring
 
         Parameters
         ----------
@@ -692,5 +699,110 @@ class DocstringProcessor(object):
         def func(f):
             doc = f.__doc__
             self.get_summary(doc or '', *args, **kwargs)
+            return f
+        return func
+
+    def get_extended_summary(self, s, base=None):
+        """Get the extended summary from a docstring
+
+        This here is the extended summary
+
+        Parameters
+        ----------
+        s: str
+            The docstring to use
+        base: str or None
+            A key under which the summary shall be stored in the :attr:`params`
+            attribute. If not None, the summary will be stored in
+            ``base + '.summary_ext'``. Otherwise, it will not be stored at
+            all
+
+        Returns
+        -------
+        str
+            The extracted extended summary"""
+        # Remove the summary and dedent
+        s = self._remove_summary(s)
+        ret = ''
+        if not self._all_sections_patt.match(s):
+            m = self._extended_summary_patt.match(s)
+            if m is not None:
+                ret = m.group().strip()
+        if base is not None:
+            self.params[base + '.summary_ext'] = ret
+        return ret
+
+    def get_extended_summaryf(self, *args, **kwargs):
+        """Extract the extended summary from a function docstring
+
+        This function can be used as a decorator to extract the extended
+        summary of a function docstring (similar to :meth:`get_sectionsf`).
+
+        Parameters
+        ----------
+        ``*args`` and ``**kwargs``
+            See the :meth:`get_extended_summary` method. Note, that the first
+            argument will be the docstring of the specified function
+
+        Returns
+        -------
+        function
+            Wrapper that takes a function as input and registers its summary
+            via the :meth:`get_extended_summary` method"""
+        def func(f):
+            doc = f.__doc__
+            self.get_extended_summary(doc or '', *args, **kwargs)
+            return f
+        return func
+
+    def get_full_description(self, s, base=None):
+        """Get the full description from a docstring
+
+        This here and the line above is the full description (i.e. the
+        combination of the :meth:`get_summary` and the
+        :meth:`get_full_description`) output
+
+        Parameters
+        ----------
+        s: str
+            The docstring to use
+        base: str or None
+            A key under which the description shall be stored in the
+            :attr:`params` attribute. If not None, the summary will be stored
+            in ``base + '.full_desc'``. Otherwise, it will not be stored
+            at all
+
+        Returns
+        -------
+        str
+            The extracted full description"""
+        summary = self.get_summary(s)
+        extended_summary = self.get_extended_summary(s)
+        ret = (summary + '\n\n' + extended_summary).strip()
+        if base is not None:
+            self.params[base + '.full_desc'] = ret
+        return ret
+
+    def get_full_descriptionf(self, *args, **kwargs):
+        """Extract the full description from a function docstring
+
+        This function can be used as a decorator to extract the full
+        descriptions of a function docstring (similar to
+        :meth:`get_sectionsf`).
+
+        Parameters
+        ----------
+        ``*args`` and ``**kwargs``
+            See the :meth:`get_full_description` method. Note, that the first
+            argument will be the docstring of the specified function
+
+        Returns
+        -------
+        function
+            Wrapper that takes a function as input and registers its summary
+            via the :meth:`get_full_description` method"""
+        def func(f):
+            doc = f.__doc__
+            self.get_full_description(doc or '', *args, **kwargs)
             return f
         return func

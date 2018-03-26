@@ -1,3 +1,17 @@
+v0.2.2
+======
+Added
+-----
+* We introduce the :meth:`DocstringProcessor.get_extended_summary` and
+  :meth:`DocstringProcessor.get_extended_summaryf` methods to extract the
+  extended summary (see the `numpy documentation guidelines`_).
+* We introduce the :meth:`DocstringProcessor.get_full_description` and
+  :meth:`DocstringProcessor.get_full_descriptionf` methods to extract the
+  full description (i.e. the summary plus extended summary) from a function
+  docstring
+
+.. _numpy documentation guidelines: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+
 v0.2.1
 ======
 Changed
