@@ -67,10 +67,14 @@ def safe_modulo(s, meta, checked='', print_warning=True, stacklevel=2):
 
         >>> from docrep import safe_modulo
         >>> s = "That's %(one)s string %(with)s missing 'with' and %s key"
-        >>> s % {'one': 1}
-        # raises KeyError because of missing 'with'
-        >>> s % {'one': 1, 'with': 2}
-        # raises TypeError because of '%s'
+        >>> s % {'one': 1}          # raises KeyError because of missing 'with'
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        KeyError: 'with'
+        >>> s % {'one': 1, 'with': 2}        # raises TypeError because of '%s'
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: not enough arguments for format string
         >>> safe_modulo(s, {'one': 1})
         "That's 1 string %(with)s missing 'with' and %s key"
     """
@@ -164,14 +168,14 @@ class DocstringProcessor(object):
         >>> print(second_test.__doc__)
         My second function where I want to use the docstring from
         above
-
+        <BLANKLINE>
         Parameters
         ----------
         a: int, optional
             A dummy parameter description
         b: int, optional
             A second dummy parameter
-
+        <BLANKLINE>
         Examples
         --------
         Some dummy example doc
