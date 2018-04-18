@@ -5,11 +5,12 @@ python:
   - "3.4"
   - "3.5"
 install:
-  - pip install coveralls
+  - pip install coveralls pytest
   - python setup.py install
 
 script:
   - coverage run --source=docrep setup.py pytest
+  - pytest docrep --doctest-modules
 
 after_success:
   coveralls
