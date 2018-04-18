@@ -592,6 +592,24 @@ class TestDocstringProcessor(_BaseTest):
         with self.assertWarns(UserWarning):
             self.ds.delete_kwargs('test')
 
+    @unittest.skipIf(not six.PY2, "Only implemented for python 2.7")
+    def test_py2_classes(self):
+        """Test the handling of classes in python 2.7"""
+        # this should work
+        @self.ds
+        class Test(object):
+            """docs"""
+        # this should not
+        self.ds.python2_classes = 'raise'
+        try:
+            @self.ds
+            class Test2(object):
+                """docs"""
+        except AttributeError:
+            pass
+        else:
+            self.fail("Should have raised AttributeError!")
+
 
 if __name__ == '__main__':
     unittest.main()

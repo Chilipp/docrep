@@ -234,6 +234,29 @@ or from the source on github_ via::
 .. _github: https://github.com/Chilipp/docrep
 
 
+.. note::
+
+    When using docrep in python 2.7, there is to mention that the ``__doc__``
+    attribute of classes is not writable, so something like
+
+    .. ipython::
+
+        In [12]: @docstrings
+           ....: class SomeClass(object):
+           ....:     """An awesome class
+           ....:
+           ....:     Parameters
+           ....:     ----------
+           ....:     %(repeated.parameters)s
+           ....:     """
+
+    would raise an error. There are several workarounds (see
+    `the issue on github <https://github.com/Chilipp/docrep/issues/5#>`__) but the
+    default for python 2.7 is, to simply not modify class docstrings. You
+    can, however, change this behaviour using the
+    :attr:`DocstringProcessor.python2_classes` attribute.
+
+
 API Reference
 =============
 

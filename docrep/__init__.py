@@ -1,10 +1,11 @@
 import types
 import six
+import inspect
 import re
 from warnings import warn
 
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 __author__ = 'Philipp Sommer'
 
@@ -226,6 +227,19 @@ class DocstringProcessor(object):
     text_sections = ['Warnings', 'Notes', 'Examples', 'See Also',
                      'References']
 
+    #: The action on how to react on classes in python 2
+    #:
+    #: When calling::
+    #:
+    #:     >>> @docstrings
+    #:     ... class NewClass(object):
+    #:     ...     """%(replacement)s"""
+    #:
+    #: This normaly raises an AttributeError, because the ``__doc__`` attribute
+    #: of a class in python 2 is not writable. This attribute may be one of
+    #: ``'ignore', 'raise' or 'warn'``
+    python2_classes = 'ignore'
+
     def __init__(self, *args, **kwargs):
         """
     Parameters
@@ -256,8 +270,17 @@ class DocstringProcessor(object):
         self.patterns = patterns
 
     def __call__(self, func):
-        func.__doc__ = func.__doc__ and safe_modulo(func.__doc__, self.params,
-                                                    stacklevel=3)
+        try:
+            func.__doc__ = func.__doc__ and safe_modulo(
+                func.__doc__, self.params, stacklevel=3)
+        except AttributeError:  # probably python2 class
+            if (self.python2_classes != 'raise' and
+                    (inspect.isclass(func) and six.PY2)):
+                if self.python2_classes == 'warn':
+                    warn("Cannot modify docstring of classes in python2!",
+                         stacklevel=2)
+            else:
+                raise
         return func
 
     def get_sections(self, s, base,
@@ -353,8 +376,17 @@ class DocstringProcessor(object):
             shall be inserted from the :attr:`params` attribute"""
         if isinstance(func, types.MethodType) and not six.PY3:
             func = func.im_func
-        func.__doc__ = func.__doc__ and self.dedents(func.__doc__,
-                                                     stacklevel=4)
+        try:
+            func.__doc__ = func.__doc__ and self.dedents(func.__doc__,
+                                                         stacklevel=4)
+        except AttributeError:  # probably python2 class
+            if (self.python2_classes != 'raise' and
+                    (inspect.isclass(func) and six.PY2)):
+                if self.python2_classes == 'warn':
+                    warn("Cannot modify docstring of classes in python2!",
+                         stacklevel=2)
+            else:
+                raise
         return func
 
     def dedents(self, s, stacklevel=3):
