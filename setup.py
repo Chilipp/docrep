@@ -35,7 +35,7 @@ setup(name='docrep',
       install_requires=[
           'six',
       ],
-      data_files = [("", ["LICENSE"])],
+      data_files=[("", ["LICENSE"])],
       setup_requires=pytest_runner,
       tests_require=['pytest'],
       zip_safe=False)
