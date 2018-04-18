@@ -65,7 +65,7 @@ def safe_modulo(s, meta, checked='', print_warning=True, stacklevel=2):
     --------
     The effects are demonstrated by this example::
 
-        >>> from psyplot.docstring import safe_modulo
+        >>> from docrep import safe_modulo
         >>> s = "That's %(one)s string %(with)s missing 'with' and %s key"
         >>> s % {'one': 1}
         # raises KeyError because of missing 'with'
@@ -110,7 +110,7 @@ class DocstringProcessor(object):
     --------
     Create docstring processor via::
 
-        >>> from psyplot.docstring import DocstringProcessor
+        >>> from docrep import DocstringProcessor
         >>> d = DocstringProcessor(doc_key='My doc string')
 
     And then use it as a decorator to process the docstring::
@@ -121,7 +121,7 @@ class DocstringProcessor(object):
         ...     pass
 
         >>> print(doc_test.__doc__)
-        That's my doc string
+        That's My doc string
 
     Use the :meth:`get_sectionsf` method to extract Parameter sections (or
     others) form the docstring for later usage (and make sure, that the
