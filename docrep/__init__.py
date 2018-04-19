@@ -270,18 +270,9 @@ class DocstringProcessor(object):
         self.patterns = patterns
 
     def __call__(self, func):
-        try:
-            func.__doc__ = func.__doc__ and safe_modulo(
-                func.__doc__, self.params, stacklevel=3)
-        except AttributeError:  # probably python2 class
-            if (self.python2_classes != 'raise' and
-                    (inspect.isclass(func) and six.PY2)):
-                if self.python2_classes == 'warn':
-                    warn("Cannot modify docstring of classes in python2!",
-                         stacklevel=2)
-            else:
-                raise
-        return func
+        doc = func.__doc__ and safe_modulo(func.__doc__, self.params,
+                                           stacklevel=3)
+        return self._set_object_doc(func, doc)
 
     def get_sections(self, s, base,
                      sections=['Parameters', 'Other Parameters']):
@@ -365,6 +356,23 @@ class DocstringProcessor(object):
             return f
         return func
 
+    def _set_object_doc(self, obj, doc, stacklevel=3):
+        """Convenience method to set the __doc__ attribute of a python object
+        """
+        if isinstance(obj, types.MethodType) and six.PY2:
+            obj = obj.im_func
+        try:
+            obj.__doc__ = doc
+        except AttributeError:  # probably python2 class
+            if (self.python2_classes != 'raise' and
+                    (inspect.isclass(obj) and six.PY2)):
+                if self.python2_classes == 'warn':
+                    warn("Cannot modify docstring of classes in python2!",
+                         stacklevel=stacklevel)
+            else:
+                raise
+        return obj
+
     def dedent(self, func):
         """
         Dedent the docstring of a function and substitute with :attr:`params`
@@ -374,20 +382,8 @@ class DocstringProcessor(object):
         func: function
             function with the documentation to dedent and whose sections
             shall be inserted from the :attr:`params` attribute"""
-        if isinstance(func, types.MethodType) and not six.PY3:
-            func = func.im_func
-        try:
-            func.__doc__ = func.__doc__ and self.dedents(func.__doc__,
-                                                         stacklevel=4)
-        except AttributeError:  # probably python2 class
-            if (self.python2_classes != 'raise' and
-                    (inspect.isclass(func) and six.PY2)):
-                if self.python2_classes == 'warn':
-                    warn("Cannot modify docstring of classes in python2!",
-                         stacklevel=2)
-            else:
-                raise
-        return func
+        doc = func.__doc__ and self.dedents(func.__doc__, stacklevel=4)
+        return self._set_object_doc(func, doc)
 
     def dedents(self, s, stacklevel=3):
         """
@@ -406,16 +402,12 @@ class DocstringProcessor(object):
 
     def with_indent(self, indent=0):
         def replace(func):
-            if isinstance(func, types.MethodType) and not six.PY3:
-                func = func.im_func
-            func.__doc__ = func.__doc__ and self.with_indents(
+            doc = func.__doc__ and self.with_indents(
                 func.__doc__, indent=indent, stacklevel=4)
-            return func
+            return self._set_object_doc(func, doc)
         return replace
 
     def with_indents(self, s, indent=0, stacklevel=3):
-        # we make a new dictionary with objects that indent the original
-        # strings if necessary. Note that the first line is not indented
         d = {key: _StrWithIndentation(val, indent)
              for key, val in six.iteritems(self.params)}
         return safe_modulo(s, d, stacklevel=stacklevel)
