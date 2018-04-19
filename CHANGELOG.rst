@@ -1,3 +1,31 @@
+v0.2.3
+======
+This minor release contains some backward incompatible changes on how to handle
+the decorators for classes in python 2.7. Thanks
+`@lesteve <https://github.com/lesteve>`__ and
+`@guillaumeeb <https://github.com/guillaumeeb>`__ for your input on this.
+
+Changed
+-------
+* When using the decorators for classes in python 2.7, e.g. via::
+
+      >>> @docstrings
+      ... class Something(object):
+      ...     "%(replacement)s"
+
+  it does not have an effect anymore. This is because class docstrings cannot
+  be modified in python 2.7 (see issue
+  `#5 <https://github.com/Chilipp/docrep/issues/5#>`__). The original behaviour
+  was to raise an error. You can restore the old behaviour by setting
+  `DocstringProcessor.python2_classes = 'raise'`.
+* Some docs have been updated (see PR
+  `#7 <https://github.com/Chilipp/docrep/pull/7>`__)
+
+Added
+-----
+* the `DocstringProcessor.python2_classes` to change the handling of classes
+  in python 2.7
+
 v0.2.2
 ======
 Added

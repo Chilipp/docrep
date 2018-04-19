@@ -1,10 +1,11 @@
 import types
 import six
+import inspect
 import re
 from warnings import warn
 
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 __author__ = 'Philipp Sommer'
 
@@ -226,6 +227,19 @@ class DocstringProcessor(object):
     text_sections = ['Warnings', 'Notes', 'Examples', 'See Also',
                      'References']
 
+    #: The action on how to react on classes in python 2
+    #:
+    #: When calling::
+    #:
+    #:     >>> @docstrings
+    #:     ... class NewClass(object):
+    #:     ...     """%(replacement)s"""
+    #:
+    #: This normaly raises an AttributeError, because the ``__doc__`` attribute
+    #: of a class in python 2 is not writable. This attribute may be one of
+    #: ``'ignore', 'raise' or 'warn'``
+    python2_classes = 'ignore'
+
     def __init__(self, *args, **kwargs):
         """
     Parameters
@@ -256,9 +270,22 @@ class DocstringProcessor(object):
         self.patterns = patterns
 
     def __call__(self, func):
-        func.__doc__ = func.__doc__ and safe_modulo(func.__doc__, self.params,
-                                                    stacklevel=3)
-        return func
+        """
+        Substitute in a docstring of a function with :attr:`params`
+
+        Parameters
+        ----------
+        func: function
+            function with the documentation whose sections
+            shall be inserted from the :attr:`params` attribute
+
+        See Also
+        --------
+        dedent: also dedents the doc
+        with_indent: also indents the doc"""
+        doc = func.__doc__ and safe_modulo(func.__doc__, self.params,
+                                           stacklevel=3)
+        return self._set_object_doc(func, doc)
 
     def get_sections(self, s, base,
                      sections=['Parameters', 'Other Parameters']):
@@ -342,6 +369,23 @@ class DocstringProcessor(object):
             return f
         return func
 
+    def _set_object_doc(self, obj, doc, stacklevel=3):
+        """Convenience method to set the __doc__ attribute of a python object
+        """
+        if isinstance(obj, types.MethodType) and six.PY2:
+            obj = obj.im_func
+        try:
+            obj.__doc__ = doc
+        except AttributeError:  # probably python2 class
+            if (self.python2_classes != 'raise' and
+                    (inspect.isclass(obj) and six.PY2)):
+                if self.python2_classes == 'warn':
+                    warn("Cannot modify docstring of classes in python2!",
+                         stacklevel=stacklevel)
+            else:
+                raise
+        return obj
+
     def dedent(self, func):
         """
         Dedent the docstring of a function and substitute with :attr:`params`
@@ -351,11 +395,8 @@ class DocstringProcessor(object):
         func: function
             function with the documentation to dedent and whose sections
             shall be inserted from the :attr:`params` attribute"""
-        if isinstance(func, types.MethodType) and not six.PY3:
-            func = func.im_func
-        func.__doc__ = func.__doc__ and self.dedents(func.__doc__,
-                                                     stacklevel=4)
-        return func
+        doc = func.__doc__ and self.dedents(func.__doc__, stacklevel=4)
+        return self._set_object_doc(func, doc)
 
     def dedents(self, s, stacklevel=3):
         """
@@ -373,15 +414,51 @@ class DocstringProcessor(object):
         return safe_modulo(s, self.params, stacklevel=stacklevel)
 
     def with_indent(self, indent=0):
+        """
+        Substitute in the docstring of a function with indented :attr:`params`
+
+        Parameters
+        ----------
+        indent: int
+            The number of spaces that the substitution should be indented
+
+        Returns
+        -------
+        function
+            Wrapper that takes a function as input and substitutes it's
+            ``__doc__`` with the indented versions of :attr:`params`
+
+        See Also
+        --------
+        with_indents, dedent"""
         def replace(func):
-            if isinstance(func, types.MethodType) and not six.PY3:
-                func = func.im_func
-            func.__doc__ = func.__doc__ and self.with_indents(
+            doc = func.__doc__ and self.with_indents(
                 func.__doc__, indent=indent, stacklevel=4)
-            return func
+            return self._set_object_doc(func, doc)
         return replace
 
     def with_indents(self, s, indent=0, stacklevel=3):
+        """
+        Substitute a string with the indented :attr:`params`
+
+        Parameters
+        ----------
+        s: str
+            The string in which to substitute
+        indent: int
+            The number of spaces that the substitution should be indented
+        stacklevel: int
+            The stacklevel for the warning raised in :func:`safe_module` when
+            encountering an invalid key in the string
+
+        Returns
+        -------
+        str
+            The substituted string
+
+        See Also
+        --------
+        with_indent, dedents"""
         # we make a new dictionary with objects that indent the original
         # strings if necessary. Note that the first line is not indented
         d = {key: _StrWithIndentation(val, indent)
