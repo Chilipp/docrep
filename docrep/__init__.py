@@ -270,6 +270,19 @@ class DocstringProcessor(object):
         self.patterns = patterns
 
     def __call__(self, func):
+        """
+        Substitute in a docstring of a function with :attr:`params`
+
+        Parameters
+        ----------
+        func: function
+            function with the documentation whose sections
+            shall be inserted from the :attr:`params` attribute
+
+        See Also
+        --------
+        dedent: also dedents the doc
+        with_indent: also indents the doc"""
         doc = func.__doc__ and safe_modulo(func.__doc__, self.params,
                                            stacklevel=3)
         return self._set_object_doc(func, doc)
@@ -401,6 +414,23 @@ class DocstringProcessor(object):
         return safe_modulo(s, self.params, stacklevel=stacklevel)
 
     def with_indent(self, indent=0):
+        """
+        Substitute in the docstring of a function with indented :attr:`params`
+
+        Parameters
+        ----------
+        indent: int
+            The number of spaces that the substitution should be indented
+
+        Returns
+        -------
+        function
+            Wrapper that takes a function as input and substitutes it's
+            ``__doc__`` with the indented versions of :attr:`params`
+
+        See Also
+        --------
+        with_indents, dedent"""
         def replace(func):
             doc = func.__doc__ and self.with_indents(
                 func.__doc__, indent=indent, stacklevel=4)
@@ -408,6 +438,29 @@ class DocstringProcessor(object):
         return replace
 
     def with_indents(self, s, indent=0, stacklevel=3):
+        """
+        Substitute a string with the indented :attr:`params`
+
+        Parameters
+        ----------
+        s: str
+            The string in which to substitute
+        indent: int
+            The number of spaces that the substitution should be indented
+        stacklevel: int
+            The stacklevel for the warning raised in :func:`safe_module` when
+            encountering an invalid key in the string
+
+        Returns
+        -------
+        str
+            The substituted string
+
+        See Also
+        --------
+        with_indent, dedents"""
+        # we make a new dictionary with objects that indent the original
+        # strings if necessary. Note that the first line is not indented
         d = {key: _StrWithIndentation(val, indent)
              for key, val in six.iteritems(self.params)}
         return safe_modulo(s, d, stacklevel=stacklevel)
