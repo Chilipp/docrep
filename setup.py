@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='docrep',
-      version='0.2.3',
+      version='0.2.4',
       description='Python package for docstring repetition',
       long_description=readme(),
       classifiers=[
@@ -25,6 +25,7 @@ setup(name='docrep',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Operating System :: OS Independent',
       ],
       keywords='docstrings docs docstring napoleon numpy reStructured text',

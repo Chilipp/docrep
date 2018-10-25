@@ -1,3 +1,9 @@
+v0.2.4
+======
+This new minor release has an improved documentation considering the
+``keep_params`` and ``keep_types`` section and triggers new builds for python
+3.7.
+
 v0.2.3
 ======
 This minor release contains some backward incompatible changes on how to handle
