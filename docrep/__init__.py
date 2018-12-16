@@ -20,8 +20,8 @@ except ImportError:
 
 
 substitution_pattern = re.compile(
-    r"""(?<!%)(%%)*%(?!%)   # uneven number of %
-        \((?P<key>(?s).*?)\)# key enclosed in brackets""", re.VERBOSE)
+    r"""(?s)(?<!%)(%%)*%(?!%)   # uneven number of %
+        \((?P<key>.*?)\)# key enclosed in brackets""", re.VERBOSE)
 
 
 summary_patt = re.compile(r'(?s).*?(?=(\n\s*\n)|$)')
