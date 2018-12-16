@@ -1,3 +1,7 @@
+v0.2.5
+======
+Minor release to fix a DeprecationWarning (see https://github.com/Chilipp/docrep/issues/12)
+
 v0.2.4
 ======
 This new minor release has an improved documentation considering the
