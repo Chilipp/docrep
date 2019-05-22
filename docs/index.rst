@@ -241,6 +241,7 @@ or from the source on github_ via::
 
     .. ipython::
 
+        @verbatim
         In [12]: @docstrings
            ....: class SomeClass(object):
            ....:     """An awesome class
