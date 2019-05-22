@@ -1,3 +1,7 @@
+v0.2.6
+======
+Minor patch to use ``inspect.cleandoc`` instead of ``matplotlib.cbook.dedent`` because the latter is deprecated in matplotlib 3.1
+
 v0.2.5
 ======
 Minor release to fix a DeprecationWarning (see https://github.com/Chilipp/docrep/issues/12)
