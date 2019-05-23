@@ -849,7 +849,8 @@ class DocstringProcessor(object):
         str
             The modified string `s` with only the descriptions of `types`
         """
-        patt = '|'.join('(?<=\n)' + s + '\n(?s).+?\n(?=\S+|$)' for s in types)
+        patt = '(?s)' + '|'.join(
+            '(?<=\n)' + s + '\n.+?\n(?=\S+|$)' for s in types)
         return ''.join(re.findall(patt, '\n' + s.strip() + '\n')).rstrip()
 
     def save_docstring(self, key):
