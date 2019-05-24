@@ -1,3 +1,7 @@
+v0.2.7
+======
+Minor patch to solve deprecation warnings for various regular expressions.
+
 v0.2.6
 ======
 Minor patch to use ``inspect.cleandoc`` instead of ``matplotlib.cbook.dedent`` because the latter is deprecated in matplotlib 3.1
