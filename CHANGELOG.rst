@@ -1,3 +1,7 @@
+v0.2.8
+======
+Minor patch to solve deprecation warnings for various regular expressions.
+
 v0.2.7
 ======
 Minor patch to solve deprecation warnings for various regular expressions.
