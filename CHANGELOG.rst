@@ -1,3 +1,50 @@
+v0.3.0
+======
+New framework for decorators
+
+This release deprecates several methods of the :class:`DocstringProcessor` in
+favor of a more uniform framework. Functions such as `get_sections` and `dedent`
+now work for both, as decorators and directly on strings. See
+:ref:`migrate-to-0.3` down below
+
+.. _changed-in-0.3:
+
+Changed
+-------
+- The following methods of the :class:`DocstringProcessor` class have been
+  deprecated:
+
+  docstring update methods for strings:
+    * ``dedents`` in favor of :meth:`~DocstringProcessor.dedent`
+    * ``with_indents`` in favor of :meth:`~DocstringProcessor.with_indent`
+  docstring analysis decorators
+    * ``get_sectionsf`` in favor of :meth:`~DocstringProcessor.get_sections`
+    * ``get_summaryf`` in favor of :meth:`~DocstringProcessor.get_summary`
+    * ``get_full_descriptionf`` in favor of :meth:`~DocstringProcessor.get_full_description`
+    * ``get_extended_summaryf`` in favor of :meth:`~DocstringProcessor.get_extended_summary`
+  docstring parameter and type extractors for strings
+    * ``delete_params_s`` in favor of :func:`docrep.delete_params`
+    * ``delete_types_s`` in favor of :func:`docrep.delete_types`
+    * ``delete_kwargs_s`` in favor of :func:`docrep.delete_kwargs`
+    * ``keep_params_s`` in favor of :func:`docrep.keep_params`
+    * ``keep_types_s`` in favor of :func:`docrep.keep_types`
+
+.. _migrate-to-0.3:
+
+Migrating from 0.2.8 to 0.3.0
+-----------------------------
+Migration is possible using the following steps:
+
+* For the deprecated update methods (see the :ref:`changes above <changed-in-0.3>`),
+  just use the above-mentioned replacement. They work for both, as decorators and
+  with strings.
+* For the analysis decorators (``get_sectionsf`` for instance, use the replacement)
+  but you need to explicitly state the `base` parameter.
+  ``@get_sectionsf('something')`` for instance needs to be replaced with
+  ``@get_sections(base='something')``
+* for the parameter and type extractor functions, just use the corresponding
+  module level function mentioned :ref:`above <changed-in-0.3>`
+
 v0.2.8
 ======
 Minor patch to solve deprecation warnings for various regular expressions.
