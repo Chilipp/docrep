@@ -12,6 +12,11 @@ A Python Module for intelligent reuse of docstrings
 
     index
 
+.. warning::
+
+    Several methods have been deprecated in version 0.3. See :ref:`migrate-to-0.3`
+    for details!
+
 .. only:: html and not epub
 
     .. list-table::
