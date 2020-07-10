@@ -394,3 +394,25 @@ if six.PY3:
     intersphinx_mapping['python'] = ('https://docs.python.org/3/', None)
 else:
     intersphinx_mapping['python'] = ('https://docs.python.org/2.7/', None)
+
+
+sections = {
+    'Updating Methods': ['dedent', 'with_indent'],
+    'Analysis Methods': ['get_sections', 'get_summary', 'get_extended_summary',
+                         'get_full_description', 'get_docstring'],
+    'Extraction Methods': ['delete_params', 'delete_kwargs', 'delete_types',
+                           'keep_params', 'keep_types']
+    }
+
+
+def group_docstring_processor_methods(app, what, name, obj, section, parent):
+    if parent is docrep.DocstringProcessor:
+        for section, vals in sections.items():
+            if name in vals:
+                return section
+    if obj.__doc__.strip().startswith("Deprecated"):
+        return "Deprecated Methods"
+
+
+def setup(app):
+    app.connect('autodocsumm-grouper', group_docstring_processor_methods)
