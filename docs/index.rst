@@ -130,7 +130,7 @@ is intended for. Hence, The code above could be rewritten via
 
     In [5]: docstrings = docrep.DocstringProcessor()
 
-    In [6]: @docstrings.get_sectionsf('do_something')
+    In [6]: @docstrings.get_sections(base='do_something')
        ...: @docstrings.dedent
        ...: def do_something(a, b):
        ...:     """
@@ -180,7 +180,7 @@ example
 
 .. ipython::
 
-    In [9]: @docstrings.get_sectionsf('do_something')
+    In [9]: @docstrings.get_sections(base='do_something')
        ...: def second_example_source(a, b):
        ...:     """Summary is on the first line
        ...:
