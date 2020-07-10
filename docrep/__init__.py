@@ -1,5 +1,4 @@
 """The documentation repetition module"""
-import types
 import six
 import inspect
 import re
@@ -384,12 +383,16 @@ class DocstringProcessor(object):
 
     def __init__(self, *args, **kwargs):
         """
-    Parameters
-    ----------
-    ``*args`` and ``**kwargs``
-        Parameters that shall be used for the substitution. Note that you can
-        only provide either ``*args`` or ``**kwargs``, furthermore most of the
-        methods like `get_sections` require ``**kwargs`` to be provided."""
+        Parameters
+        ----------
+        ``*args``
+            Positional parameters that shall be used for the substitution. Note
+            that you can only provide either ``*args`` or ``**kwargs``,
+            furthermore most of the methods like `get_sections` require
+            ``**kwargs`` to be provided (if any).
+        ``**kwargs``
+            Initial parameters to use
+        """
         if len(args) and len(kwargs):
             raise ValueError("Only positional or keyword args are allowed")
         self.params = args or kwargs
@@ -414,7 +417,7 @@ class DocstringProcessor(object):
     @updates_docstring
     def __call__(self, s):
         """
-        Substitute in a docstring of a function with :attr:`params`
+        Substitute in a docstring of a function with :attr:`params`.
 
         Parameters
         ----------
@@ -425,16 +428,18 @@ class DocstringProcessor(object):
         See Also
         --------
         dedent: also dedents the doc
-        with_indent: also indents the doc"""
+        with_indent: also indents the doc
+        """
         return safe_modulo(s, self.params, stacklevel=3)
 
     @reads_docstring
     def get_sections(self, s, base=None,
                      sections=['Parameters', 'Other Parameters']):
-        """
-        Method that extracts the specified sections out of the given string if
-        (and only if) the docstring follows the numpy documentation guidelines
-        [1]_. Note that the section either must appear in the
+        r"""Exctract sections out of a docstring.
+
+        This method extracts the specified `sections` out of the given string
+        if (and only if) the docstring follows the numpy documentation
+        guidelines [1]_. Note that the section either must appear in the
         :attr:`param_like_sections` or the :attr:`text_sections` attribute.
 
         Parameters
@@ -445,7 +450,7 @@ class DocstringProcessor(object):
             base to use in the :attr:`sections` attribute
         sections: list of str
             sections to look for. Each section must be followed by a newline
-            character ('\\n') and a bar of '-' (following the numpy (napoleon)
+            character ('\n') and a bar of '-' (following the numpy (napoleon)
             docstring conventions).
 
         Returns
@@ -544,7 +549,7 @@ class DocstringProcessor(object):
 
     def delete_params(self, base_key, *params):
         """
-        Method to delete a parameter from a parameter documentation.
+        Delete a parameter from a parameter documentation.
 
         This method deletes the given `param` from the `base_key` item in the
         :attr:`params` dictionary and creates a new item with the original
@@ -567,14 +572,15 @@ class DocstringProcessor(object):
 
         See Also
         --------
-        delete_types, keep_params"""
+        delete_types, keep_params
+        """
         self.params[
             base_key + '.no_' + '|'.join(params)] = delete_params(
                 self.params[base_key], *params)
 
     def delete_kwargs(self, base_key, args=None, kwargs=None):
         """
-        Deletes the ``*args`` or ``**kwargs`` part from the parameters section
+        Delete the ``*args`` or ``**kwargs`` part from the parameters section.
 
         Either `args` or `kwargs` must not be None. The resulting key will be
         stored in
@@ -600,7 +606,8 @@ class DocstringProcessor(object):
         The type name of `args` in the base has to be like ````*<args>````
         (i.e. the `args` argument preceeded by a ``'*'`` and enclosed by double
         ``'`'``). Similarily, the type name of `kwargs` in `s` has to be like
-        ````**<kwargs>````"""
+        ````**<kwargs>````
+        """
         if not args and not kwargs:
             warn("Neither args nor kwargs are given. I do nothing for %s" % (
                 base_key))
@@ -612,7 +619,7 @@ class DocstringProcessor(object):
 
     def delete_types(self, base_key, out_key, *types):
         """
-        Method to delete a parameter from a parameter documentation.
+        Delete a parameter from a parameter documentation.
 
         This method deletes the given `param` from the `base_key` item in the
         :attr:`params` dictionary and creates a new item with the original
@@ -641,7 +648,7 @@ class DocstringProcessor(object):
 
     def keep_params(self, base_key, *params):
         """
-        Method to keep only specific parameters from a parameter documentation.
+        Keep only specific parameters from a parameter documentation.
 
         This method extracts the given `param` from the `base_key` item in the
         :attr:`params` dictionary and creates a new item with the original
@@ -811,7 +818,7 @@ class DocstringProcessor(object):
 
     @reads_docstring
     def get_docstring(self, s, base=None):
-        """get a docstring from a function.
+        """Get a docstring of a function.
 
         Like the :meth:`get_sections` method this method serves as a
         descriptor for functions but saves the entire docstring.
