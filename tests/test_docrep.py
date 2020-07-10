@@ -14,6 +14,10 @@ if six.PY2:
             "Do nothing here since it is not implemented in Python2"
             return warnings.catch_warnings(record=True)
 
+        def assertWarnsRegex(self, *args, **kwargs):
+            "Do nothing here since it is not implemented in Python2"
+            return warnings.catch_warnings(record=True)
+
 else:
     _BaseTest = unittest.TestCase
 
@@ -171,7 +175,7 @@ class TestDocstringProcessor(_BaseTest):
     def tearDown(self):
         del self.ds
 
-    def test_get_sectionsf(self, indented=False):
+    def test_get_sections(self, indented=False):
         """Test whether the parameter sections are extracted correctly"""
         if indented:
             def indent(s):
@@ -200,9 +204,10 @@ class TestDocstringProcessor(_BaseTest):
                 see_also_header + '\n' + see_also))
         base = 'test'
 
-        decorator = self.ds.get_sectionsf(
-            base, sections=['Examples', 'Parameters', 'Other Parameters',
-                            'Returns', 'Notes', 'See Also', 'References'])
+        decorator = self.ds.get_sections(
+            base=base,
+            sections=['Examples', 'Parameters', 'Other Parameters',
+                      'Returns', 'Notes', 'See Also', 'References'])
         decorator(test)
 
         ds = self.ds
@@ -215,11 +220,11 @@ class TestDocstringProcessor(_BaseTest):
         self.assertEqual(ds.params[base + '.see_also'], see_also)
         self.assertEqual(ds.params[base + '.references'], '')
 
-    def test_get_sectionsf_indented(self):
-        self.test_get_sectionsf(indented=True)
+    def test_get_sections_indented(self):
+        self.test_get_sections(indented=True)
 
     def test_dedent(self):
-        self.test_get_sectionsf()
+        self.test_get_sections()
 
         with self.assertWarns(SyntaxWarning):
             @self.ds.dedent
@@ -246,7 +251,7 @@ class TestDocstringProcessor(_BaseTest):
         self.assertEqual(test2.__doc__, ref)
 
     def test_with_indent(self):
-        self.test_get_sectionsf_indented()
+        self.test_get_sections_indented()
 
         with self.assertWarns(SyntaxWarning):
             @self.ds.with_indent(16)
@@ -276,7 +281,7 @@ class TestDocstringProcessor(_BaseTest):
         self.assertEqual(s, ref)
 
     def test_dedents(self):
-        self.test_get_sectionsf()
+        self.test_get_sections()
         s = """
             A test function with used docstring from another
 
@@ -303,7 +308,7 @@ class TestDocstringProcessor(_BaseTest):
 
     def test_save_docstring(self):
         """Test the :meth:`docrep.DocstringProcessor.save_docstring` method"""
-        @self.ds.save_docstring('test')
+        @self.ds.save_docstring(base='test')
         def test():
             "Just a test\n\nwith something"
             pass
@@ -311,7 +316,7 @@ class TestDocstringProcessor(_BaseTest):
         self.assertEqual(self.ds.params['test'],
                          "Just a test\n\nwith something")
 
-    def test_get_summaryf(self):
+    def test_get_summary(self):
         """Test whether the summary is extracted correctly"""
 
         doc = (
@@ -321,20 +326,20 @@ class TestDocstringProcessor(_BaseTest):
             pass
         test_oneline.__doc__ = summary + '\n\n' + doc
 
-        self.ds.get_summaryf('test1')(test_oneline)
+        self.ds.get_summary(base='test1')(test_oneline)
         self.assertEqual(self.ds.params['test1.summary'], summary)
 
         def test_multiline():
             pass
         test_multiline.__doc__ = multiline_summary + '\n\n' + doc
 
-        self.ds.get_summaryf('test2')(test_multiline)
+        self.ds.get_summary(base='test2')(test_multiline)
         self.assertEqual(self.ds.params['test2.summary'], multiline_summary)
 
         def test_summary_only():
             pass
         test_summary_only.__doc__ = summary
-        self.ds.get_summaryf('test3')(test_summary_only)
+        self.ds.get_summary(base='test3')(test_summary_only)
         self.assertEqual(self.ds.params['test3.summary'], summary)
 
     def test_get_extended_summary(self):
@@ -347,7 +352,7 @@ class TestDocstringProcessor(_BaseTest):
             pass
         test_basic.__doc__ = summary + '\n\n' + doc
 
-        self.ds.get_extended_summaryf('test1')(test_basic)
+        self.ds.get_extended_summary(base='test1')(test_basic)
         self.assertEqual(self.ds.params['test1.summary_ext'],
                          random_text.strip())
 
@@ -355,13 +360,13 @@ class TestDocstringProcessor(_BaseTest):
             pass
         test_no_extended_summary.__doc__ = doc
 
-        self.ds.get_extended_summaryf('test2')(test_no_extended_summary)
+        self.ds.get_extended_summary(base='test2')(test_no_extended_summary)
         self.assertEqual(self.ds.params['test2.summary_ext'], '')
 
         def test_no_params():
             pass
         test_no_params.__doc__ = summary + '\n\n' + random_text
-        self.ds.get_extended_summaryf('test3')(test_no_params)
+        self.ds.get_extended_summary(base='test3')(test_no_params)
         self.assertEqual(self.ds.params['test3.summary_ext'],
                          random_text.strip())
 
@@ -375,7 +380,7 @@ class TestDocstringProcessor(_BaseTest):
             pass
         test_basic.__doc__ = summary + '\n\n' + doc
 
-        self.ds.get_full_descriptionf('test1')(test_basic)
+        self.ds.get_full_description(base='test1')(test_basic)
         self.assertEqual(self.ds.params['test1.full_desc'],
                          summary + '\n\n' + random_text.strip())
 
@@ -383,14 +388,14 @@ class TestDocstringProcessor(_BaseTest):
             pass
         test_no_extended_summary.__doc__ = doc
 
-        self.ds.get_full_descriptionf('test2')(test_no_extended_summary)
+        self.ds.get_full_description(base='test2')(test_no_extended_summary)
         self.assertEqual(self.ds.params['test2.full_desc'],
                          random_text.strip())
 
         def test_no_params():
             pass
         test_no_params.__doc__ = summary + '\n\n' + random_text
-        self.ds.get_full_descriptionf('test3')(test_no_params)
+        self.ds.get_full_description(base='test3')(test_no_params)
         self.assertEqual(self.ds.params['test3.full_desc'],
                          summary + '\n\n' + random_text.strip())
 
@@ -609,6 +614,148 @@ class TestDocstringProcessor(_BaseTest):
             pass
         else:
             self.fail("Should have raised AttributeError!")
+
+
+class DepreceationsTest(_BaseTest):
+    """Test case for depreceated methods"""
+
+    def setUp(self):
+        self.ds = docrep.DocstringProcessor()
+
+    def tearDown(self):
+        del self.ds
+
+    def test_get_sectionsf(self, indented=False):
+        """Test whether the parameter sections are extracted correctly"""
+        if indented:
+            def indent(s):
+                return ' ' * 4 + ('\n' + ' ' * 4).join(s.splitlines())
+        else:
+            def indent(s):
+                return s
+
+        self.params_section = ps = simple_param + '\n' + complex_param
+        self.other_params_section = ops = (
+            simple_multiline_param + '\n' + very_complex_param)
+        self.returns_section = rs = (
+            simple_return_type + '\n' + very_complex_return_type)
+
+        def test():
+            pass
+
+        test.__doc__ = (
+            summary + '\n\n' + indent(
+                random_text + '\n\n' +
+                parameters_header + '\n' + ps + '\n\n' +
+                other_parameters_header + '\n' + ops + '\n\n' +
+                returns_header + '\n' + rs + '\n\n' +
+                examples_header + '\n' + examples + '\n\n' +
+                notes_header + '\n' + notes + '\n\n' +
+                see_also_header + '\n' + see_also))
+        base = 'test'
+
+        with self.assertWarnsRegex(DeprecationWarning, 'get_sectionsf'):
+            decorator = self.ds.get_sectionsf(
+                base, sections=['Examples', 'Parameters', 'Other Parameters',
+                                'Returns', 'Notes', 'See Also', 'References'])
+        decorator(test)
+
+        ds = self.ds
+        self.assertEqual(ds.params[base + '.parameters'], ps)
+        self.assertEqual(ds.params[base + '.other_parameters'],
+                         ops)
+        self.assertEqual(ds.params[base + '.returns'], rs)
+        self.assertEqual(ds.params[base + '.examples'], examples)
+        self.assertEqual(ds.params[base + '.notes'], notes)
+        self.assertEqual(ds.params[base + '.see_also'], see_also)
+        self.assertEqual(ds.params[base + '.references'], '')
+
+    def test_dedents(self):
+        self.test_get_sectionsf()
+        s = """
+            A test function with used docstring from another
+
+            Parameters
+            ----------
+            %(test.parameters)s
+            %(missing)s
+
+            Examples
+            --------
+            %(test.examples)s"""
+
+        ref = ("A test function with used docstring from another\n"
+               "\n"
+               "Parameters\n"
+               "----------\n" +
+               self.params_section + '\n%(missing)s\n\n' +
+               examples_header + '\n' + examples)
+
+        with self.assertWarnsRegex(DeprecationWarning, 'dedents'):
+            res = self.ds.dedents(s)
+
+        self.assertEqual(res, ref)
+
+    def test_keep_params_s(self):
+        all_pdescs = [simple_param, simple_param2, complex_param,
+                      very_complex_param, simple_multiline_param]
+        pdescs = [simple_param, very_complex_param]
+        params = [pdesc.splitlines()[0].split(':')[0].strip()
+                  for pdesc in pdescs]
+        joined_pdescs = '\n'.join(pdescs)
+        ds = docrep.DocstringProcessor()
+        with self.assertWarnsRegex(DeprecationWarning, 'keep_params_s'):
+            txt = ds.keep_params_s('\n'.join(all_pdescs), *params)
+        # check single
+        self.assertEqual(txt, joined_pdescs,
+                         msg='Wrong description for params {}'.format(params))
+
+    def test_get_summaryf(self):
+        """Test whether the summary is extracted correctly"""
+
+        doc = (
+            random_text + '\n\n' + parameters_header + '\n' + complex_param)
+
+        def test_oneline():
+            pass
+        test_oneline.__doc__ = summary + '\n\n' + doc
+
+        with self.assertWarnsRegex(DeprecationWarning, 'get_summaryf'):
+            self.ds.get_summaryf('test1')(test_oneline)
+        self.assertEqual(self.ds.params['test1.summary'], summary)
+
+
+    def test_get_extended_summary(self):
+        """Test whether the extended summary is extracted correctly"""
+
+        doc = (
+            random_text + '\n\n' + parameters_header + '\n' + complex_param)
+
+        def test_basic():
+            pass
+        test_basic.__doc__ = summary + '\n\n' + doc
+
+        with self.assertWarnsRegex(DeprecationWarning,
+                                   'get_extended_summaryf'):
+            self.ds.get_extended_summaryf('test1')(test_basic)
+        self.assertEqual(self.ds.params['test1.summary_ext'],
+                         random_text.strip())
+
+    def test_get_full_description(self):
+        """Test whether the full description is extracted correctly"""
+
+        doc = (
+            random_text + '\n\n' + parameters_header + '\n' + complex_param)
+
+        def test_basic():
+            pass
+        test_basic.__doc__ = summary + '\n\n' + doc
+
+        with self.assertWarnsRegex(DeprecationWarning,
+                                   'get_full_descriptionf'):
+            self.ds.get_full_descriptionf('test1')(test_basic)
+        self.assertEqual(self.ds.params['test1.full_desc'],
+                         summary + '\n\n' + random_text.strip())
 
 
 if __name__ == '__main__':
