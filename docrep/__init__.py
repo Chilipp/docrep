@@ -22,7 +22,6 @@ __all__ = [
     "keep_params",
     "keep_types",
     "DocstringProcessor",
-    "dedents",
 ]
 
 
@@ -412,7 +411,8 @@ class DocstringProcessor(object):
         self._all_sections_patt = re.compile(all_sections_patt)
         self.patterns = patterns
 
-    def __call__(self, func):
+    @updates_docstring
+    def __call__(self, s):
         """
         Substitute in a docstring of a function with :attr:`params`
 
@@ -426,9 +426,7 @@ class DocstringProcessor(object):
         --------
         dedent: also dedents the doc
         with_indent: also indents the doc"""
-        doc = func.__doc__ and safe_modulo(func.__doc__, self.params,
-                                           stacklevel=3)
-        return self._set_object_doc(func, doc)
+        return safe_modulo(s, self.params, stacklevel=3)
 
     @reads_docstring
     def get_sections(self, s, base=None,
@@ -497,27 +495,10 @@ class DocstringProcessor(object):
         except AttributeError:
             return ''
 
-    def _set_object_doc(self, obj, doc, stacklevel=3):
-        warn("The DocstringProcessor._set_object_doc method has been "
-             "depreceated.", DeprecationWarning)
-        if isinstance(obj, types.MethodType) and six.PY2:
-            obj = obj.im_func
-        try:
-            obj.__doc__ = doc
-        except AttributeError:  # probably python2 class
-            if (self.python2_classes != 'raise' and
-                    (inspect.isclass(obj) and six.PY2)):
-                if self.python2_classes == 'warn':
-                    warn("Cannot modify docstring of classes in python2!",
-                         stacklevel=stacklevel)
-            else:
-                raise
-        return obj
-
     @updates_docstring
     def dedent(self, s, stacklevel=3):
         """
-        Dedent a string and substitute with the :attr:`params` attribute
+        Dedent a string and substitute with the :attr:`params` attribute.
 
         Parameters
         ----------
@@ -526,14 +507,15 @@ class DocstringProcessor(object):
             attribute
         stacklevel: int
             The stacklevel for the warning raised in :func:`safe_module` when
-            encountering an invalid key in the string"""
+            encountering an invalid key in the string
+        """
         s = inspect.cleandoc(s)
         return safe_modulo(s, self.params, stacklevel=stacklevel)
 
     @updates_docstring
     def with_indent(self, s, indent=0, stacklevel=3):
         """
-        Substitute a string with the indented :attr:`params`
+        Substitute a string with the indented :attr:`params`.
 
         Parameters
         ----------
@@ -552,7 +534,8 @@ class DocstringProcessor(object):
 
         See Also
         --------
-        with_indent, dedents"""
+        with_indent, dedent
+        """
         # we make a new dictionary with objects that indent the original
         # strings if necessary. Note that the first line is not indented
         d = {key: _StrWithIndentation(val, indent)

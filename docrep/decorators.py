@@ -1,5 +1,7 @@
 """Decorator functions for overloaded and deprecated methods"""
 import six
+import types
+import inspect
 from warnings import warn
 from functools import wraps
 
@@ -13,12 +15,12 @@ def updates_docstring(func):
             return func(self, *args, **kwargs)
         elif len(args) and callable(args[0]):
             doc = func(self, args[0].__doc__, *args[1:], **kwargs)
-            args[0].__doc__ = doc
+            _set_object_doc(args[0], doc, py2_class=self.python2_classes)
             return args[0]
         else:
             def decorator(f):
                 doc = func(self, f.__doc__, *args, **kwargs)
-                f.__doc__ = doc
+                _set_object_doc(f, doc, py2_class=self.python2_classes)
                 return f
             return decorator
 
@@ -115,3 +117,21 @@ def deprecated_function(replacement, replace=True, replacement_name=None):
         return deprecated
 
     return decorate
+
+
+def _set_object_doc(obj, doc, stacklevel=3, py2_class='warn'):
+    warn("The DocstringProcessor._set_object_doc method has been "
+         "depreceated.", DeprecationWarning)
+    if isinstance(obj, types.MethodType) and six.PY2:
+        obj = obj.im_func
+    try:
+        obj.__doc__ = doc
+    except AttributeError:  # probably python2 class
+        if (py2_class!= 'raise' and
+                (inspect.isclass(obj) and six.PY2)):
+            if py2_class == 'warn':
+                warn("Cannot modify docstring of classes in python2!",
+                     stacklevel=stacklevel)
+        else:
+            raise
+    return obj
