@@ -3,13 +3,22 @@ import six
 import types
 import inspect
 from warnings import warn
-from functools import wraps
+import functools
+
+
+deprecated_doc = """
+    Deprecated {type}
+
+    .. deprecated:: {version}
+
+        Use :{type_short}:`{replacement}` instead!
+"""
 
 
 def updates_docstring(func):
     """Decorate a method that updates the docstring of a function."""
 
-    @wraps(func)
+    @functools.wraps(func)
     def update_docstring(self, *args, **kwargs):
         if not len(args) or isinstance(args[0], six.string_types):
             return func(self, *args, **kwargs)
@@ -30,7 +39,7 @@ def updates_docstring(func):
 def reads_docstring(func):
     """Decorate a method that accepts a string or function."""
 
-    @wraps(func)
+    @functools.wraps(func)
     def use_docstring(self, s=None, base=None, *args, **kwargs):
         # if only the base key is provided, use this method
         if s:
@@ -50,7 +59,8 @@ def reads_docstring(func):
     return use_docstring
 
 
-def deprecated_method(replacement, replace=True, replacement_name=None):
+def deprecated_method(replacement, version, replace=True,
+                      replacement_name=None):
     """Mark a method as deprecated.
 
     Parameters
@@ -65,13 +75,14 @@ def deprecated_method(replacement, replace=True, replacement_name=None):
         The name of the replacement function to use in the warning message
     """
 
+    replacement_name = replacement_name or getattr(
+        replacement, '__name__', replacement)
+
     def decorate(func):
 
         msg = "The %s method is deprecated, use the %s method instead" % (
-            func.__name__,
-            replacement_name or getattr(replacement, '__name__', replacement))
+            func.__name__, replacement_name)
 
-        @wraps(func)
         def deprecated(self, *args, **kwargs):
             warn(msg, DeprecationWarning, stacklevel=2)
             if callable(replacement) and replace:
@@ -81,12 +92,19 @@ def deprecated_method(replacement, replace=True, replacement_name=None):
             else:
                 return func(self, *args, **kwargs)
 
-        return deprecated
+        deprecated.__doc__ = deprecated_doc.format(
+            type="method", version=version, replacement=replacement_name,
+            type_short="meth")
+
+        return functools.wraps(
+            func, assigned=set(functools.WRAPPER_ASSIGNMENTS) - {'__doc__'})(
+                deprecated)
 
     return decorate
 
 
-def deprecated_function(replacement, replace=True, replacement_name=None):
+def deprecated_function(replacement, version, replace=True,
+                        replacement_name=None):
     """Mark a method as deprecated.
 
     Parameters
@@ -101,12 +119,13 @@ def deprecated_function(replacement, replace=True, replacement_name=None):
         `replacement.__name__` is used
     """
 
+    replacement_name = replacement_name or replacement.__name__
+
     def decorate(func):
 
         msg = "The %s function is deprecated, use the %s method instead" % (
-            func.__name__, replacement_name or replacement.__name__)
+            func.__name__, replacement_name)
 
-        @wraps(func)
         def deprecated(*args, **kwargs):
             warn(msg, DeprecationWarning, stacklevel=2)
             if replace:
@@ -114,7 +133,13 @@ def deprecated_function(replacement, replace=True, replacement_name=None):
             else:
                 return func(*args, **kwargs)
 
-        return deprecated
+        deprecated.__doc__ = deprecated_doc.format(
+            type="function", version=version, replacement=replacement_name,
+            type_short="func")
+
+        return functools.wraps(
+            func, assigned=set(functools.WRAPPER_ASSIGNMENTS) - {'__doc__'})(
+                deprecated)
 
     return decorate
 
