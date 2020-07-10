@@ -22,6 +22,7 @@ Changed
     * ``get_summaryf`` in favor of :meth:`~DocstringProcessor.get_summary`
     * ``get_full_descriptionf`` in favor of :meth:`~DocstringProcessor.get_full_description`
     * ``get_extended_summaryf`` in favor of :meth:`~DocstringProcessor.get_extended_summary`
+    * ``save_docstring`` in favor of :meth:`~DocstringProcessorget_docstring`
   docstring parameter and type extractors for strings
     * ``delete_params_s`` in favor of :func:`docrep.delete_params`
     * ``delete_types_s`` in favor of :func:`docrep.delete_types`

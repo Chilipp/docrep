@@ -810,8 +810,8 @@ class DocstringProcessor(object):
             self.params[base_key], *types)
 
     @reads_docstring
-    def save_docstring(self, s, base=None):
-        """Save a docstring from a function.
+    def get_docstring(self, s, base=None):
+        """get a docstring from a function.
 
         Like the :meth:`get_sections` method this method serves as a
         descriptor for functions but saves the entire docstring.
@@ -947,6 +947,10 @@ class DocstringProcessor(object):
     @deprecated_function(_keep_types_s, True, 'docrep.keep_types')
     def keep_types_s(*args, **kwargs):
         pass
+
+    @deprecated_method('get_docstring', replace=False)
+    def save_docstring(self, *args, **kwargs):
+        return self.get_docstring(base=args[0], *args[1:], **kwargs)
 
     @deprecated_method('get_summary', replace=False)
     def get_summaryf(self, *args, **kwargs):

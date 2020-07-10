@@ -306,9 +306,9 @@ class TestDocstringProcessor(_BaseTest):
 
         self.assertEqual(res, ref)
 
-    def test_save_docstring(self):
+    def test_get_docstring(self):
         """Test the :meth:`docrep.DocstringProcessor.save_docstring` method"""
-        @self.ds.save_docstring(base='test')
+        @self.ds.get_docstring(base='test')
         def test():
             "Just a test\n\nwith something"
             pass
@@ -756,6 +756,20 @@ class DepreceationsTest(_BaseTest):
             self.ds.get_full_descriptionf('test1')(test_basic)
         self.assertEqual(self.ds.params['test1.full_desc'],
                          summary + '\n\n' + random_text.strip())
+
+    def test_save_docstring(self):
+        """Test the :meth:`docrep.DocstringProcessor.save_docstring` method"""
+        def test():
+            "Just a test\n\nwith something"
+            pass
+
+        with self.assertWarnsRegex(DeprecationWarning, 'save_docstring'):
+            self.ds.save_docstring('test')(test)
+
+        self.assertEqual(self.ds.params['test'],
+                         "Just a test\n\nwith something")
+
+
 
 
 if __name__ == '__main__':
