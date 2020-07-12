@@ -11,7 +11,7 @@ deprecated_doc = """
 
     .. deprecated:: {version}
 
-        Use :{type_short}:`{replacement}` instead!
+        Use :{type_short}:`{replacement}` instead! {removed_in}
 """
 
 
@@ -60,7 +60,8 @@ def reads_docstring(func):
     return use_docstring
 
 
-def deprecated(replacement, version, replace=True, replacement_name=None):
+def deprecated(replacement, version, replace=True, replacement_name=None,
+               removed_in=None):
     """Mark a method as deprecated.
 
     Parameters
@@ -90,8 +91,12 @@ def deprecated(replacement, version, replace=True, replacement_name=None):
         else:
             what = 'function'
 
-        msg = "The {name} {type} is deprecated, use the {repl} {type} instead"
+        msg = "The {name} {type} is deprecated, use the {repl} {type} instead."
         msg = msg.format(name=func.__name__, type=what, repl=replacement_name)
+
+        if removed_in:
+            msg += " {name} will be removed in {removed_in}".format(
+                name=func.__name__, removed_in=removed_in)
 
         if what == 'method':
 
@@ -121,7 +126,9 @@ def deprecated(replacement, version, replace=True, replacement_name=None):
 
         deprecated.__doc__ = deprecated_doc.format(
             type=what, version=version, replacement=replacement_name,
-            type_short=what[:4])
+            type_short=what[:4],
+            removed_in=(("It will be removed in version {%s}." % removed_in)
+                        if removed_in else ""))
 
         return functools.wraps(
             func, assigned=set(functools.WRAPPER_ASSIGNMENTS) - {'__doc__'})(
