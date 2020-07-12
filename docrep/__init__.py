@@ -5,7 +5,7 @@ import re
 from warnings import warn
 
 from docrep.decorators import (
-    updates_docstring, reads_docstring, deprecated_method, deprecated_function)
+    updates_docstring, reads_docstring, deprecated)
 
 
 __version__ = '0.3.0.dev0'
@@ -393,7 +393,7 @@ class DocstringProcessor(object):
         ``**kwargs``
             Initial parameters to use
         """
-        if len(args) and len(kwargs):
+        if args and kwargs:
             raise ValueError("Only positional or keyword args are allowed")
         self.params = args or kwargs
         patterns = {}
@@ -918,61 +918,61 @@ class DocstringProcessor(object):
 
     # ------------------ DEPRECATED METHODS -----------------------------------
 
-    @deprecated_method('dedent', "0.3.0")
+    @deprecated('dedent', "0.3.0")
     def dedents(self, *args, **kwargs):
         pass
 
-    @deprecated_method('get_sections', "0.3.0", replace=False)
+    @deprecated('get_sections', "0.3.0", replace=False)
     def get_sectionsf(self, *args, **kwargs):
         return self.get_sections(base=args[0], *args[1:], **kwargs)
 
-    @deprecated_method('with_indent', "0.3.0")
+    @deprecated('with_indent', "0.3.0")
     def with_indents(self, *args, **kwargs):
         pass
 
     @staticmethod
-    @deprecated_function(_delete_params_s, "0.3.0", True, 'docrep.delete_params')
+    @deprecated(_delete_params_s, "0.3.0", True, 'docrep.delete_params')
     def delete_params_s(*args, **kwargs):
         pass
 
     @staticmethod
-    @deprecated_function(_delete_types_s, "0.3.0", True, 'docrep.delete_types')
+    @deprecated(_delete_types_s, "0.3.0", True, 'docrep.delete_types')
     def delete_types_s(*args, **kwargs):
         pass
 
     @classmethod
-    @deprecated_method(_delete_kwargs_s, "0.3.0", True, 'docrep.delete_kwargs')
+    @deprecated(_delete_kwargs_s, "0.3.0", True, 'docrep.delete_kwargs')
     def delete_kwargs_s(cls, *args, **kwargs):
         pass
 
     @staticmethod
-    @deprecated_function(_keep_params_s, "0.3.0", True, 'docrep.keep_params')
+    @deprecated(_keep_params_s, "0.3.0", True, 'docrep.keep_params')
     def keep_params_s(*args, **kwargs):
         pass
 
     @staticmethod
-    @deprecated_function(_keep_types_s, "0.3.0", True, 'docrep.keep_types')
+    @deprecated(_keep_types_s, "0.3.0", True, 'docrep.keep_types')
     def keep_types_s(*args, **kwargs):
         pass
 
-    @deprecated_method('get_docstring', "0.3.0", replace=False)
+    @deprecated('get_docstring', "0.3.0", replace=False)
     def save_docstring(self, *args, **kwargs):
         return self.get_docstring(base=args[0], *args[1:], **kwargs)
 
-    @deprecated_method('get_summary', "0.3.0", replace=False)
+    @deprecated('get_summary', "0.3.0", replace=False)
     def get_summaryf(self, *args, **kwargs):
         return self.get_summary(base=args[0], *args[1:], **kwargs)
 
-    @deprecated_method('get_full_description', "0.3.0", replace=False)
+    @deprecated('get_full_description', "0.3.0", replace=False)
     def get_full_descriptionf(self, *args, **kwargs):
         return self.get_full_description(base=args[0], *args[1:], **kwargs)
 
-    @deprecated_method('get_extended_summary', "0.3.0", replace=False)
+    @deprecated('get_extended_summary', "0.3.0", replace=False)
     def get_extended_summaryf(self, *args, **kwargs):
         return self.get_extended_summary(base=args[0], *args[1:], **kwargs)
 
 
-@deprecated_function(inspect.cleandoc, "0.2.6",
+@deprecated(inspect.cleandoc, "0.2.6",
                      replacement_name='inspect.cleandoc')
 def dedents(s):
     pass

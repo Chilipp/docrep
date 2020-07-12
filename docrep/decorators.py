@@ -51,6 +51,7 @@ def reads_docstring(func):
 
             def decorator(f):
                 func(self, f.__doc__, base, *args, **kwargs)
+                return f
 
             return decorator
         else:
@@ -59,8 +60,7 @@ def reads_docstring(func):
     return use_docstring
 
 
-def deprecated_method(replacement, version, replace=True,
-                      replacement_name=None):
+def deprecated(replacement, version, replace=True, replacement_name=None):
     """Mark a method as deprecated.
 
     Parameters
@@ -80,62 +80,48 @@ def deprecated_method(replacement, version, replace=True,
 
     def decorate(func):
 
-        msg = "The %s method is deprecated, use the %s method instead" % (
-            func.__name__, replacement_name)
+        try:
+            args = inspect.getfullargspec(func).args
+        except AttributeError:  # py27
+            args = inspect.getargspec(func).args
 
-        def deprecated(self, *args, **kwargs):
-            warn(msg, DeprecationWarning, stacklevel=2)
-            if callable(replacement) and replace:
-                return replacement(*args, **kwargs)
-            elif replace:
-                return getattr(self, replacement)(*args, **kwargs)
-            else:
-                return func(self, *args, **kwargs)
+        if args and args[0] in ['self', 'cls']:  # assume classmethod or method
+            what = 'method'
+        else:
+            what = 'function'
 
-        deprecated.__doc__ = deprecated_doc.format(
-            type="method", version=version, replacement=replacement_name,
-            type_short="meth")
+        msg = "The {name} {type} is deprecated, use the {repl} {type} instead"
+        msg = msg.format(name=func.__name__, type=what, repl=replacement_name)
 
-        return functools.wraps(
-            func, assigned=set(functools.WRAPPER_ASSIGNMENTS) - {'__doc__'})(
-                deprecated)
+        if what == 'method':
 
-    return decorate
+            def deprecated(self, *args, **kwargs):
+                warn(msg, DeprecationWarning, stacklevel=2)
+                if callable(replacement) and replace:
+                    return replacement(*args, **kwargs)
+                elif replace:
+                    return getattr(self, replacement)(*args, **kwargs)
+                else:
+                    return func(self, *args, **kwargs)
 
+        else:
 
-def deprecated_function(replacement, version, replace=True,
-                        replacement_name=None):
-    """Mark a method as deprecated.
-
-    Parameters
-    ----------
-    replacement: callable
-        A function to call instead, in case `replace` is True
-    replace: bool
-        Whether to replace the call of the function with a call of
-        `replacement`
-    replacement_name: str
-        The name of the `replacement` function. If this is None,
-        `replacement.__name__` is used
-    """
-
-    replacement_name = replacement_name or replacement.__name__
-
-    def decorate(func):
-
-        msg = "The %s function is deprecated, use the %s method instead" % (
-            func.__name__, replacement_name)
-
-        def deprecated(*args, **kwargs):
-            warn(msg, DeprecationWarning, stacklevel=2)
             if replace:
-                return replacement(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
+                if not callable(replacement):
+                    raise ValueError(
+                        "Replacement functions for deprecated functions must "
+                        "be callable!")
+
+            def deprecated(*args, **kwargs):
+                warn(msg, DeprecationWarning, stacklevel=2)
+                if replace:
+                    return replacement(*args, **kwargs)
+                else:
+                    return func(*args, **kwargs)
 
         deprecated.__doc__ = deprecated_doc.format(
-            type="function", version=version, replacement=replacement_name,
-            type_short="func")
+            type=what, version=version, replacement=replacement_name,
+            type_short=what[:4])
 
         return functools.wraps(
             func, assigned=set(functools.WRAPPER_ASSIGNMENTS) - {'__doc__'})(
