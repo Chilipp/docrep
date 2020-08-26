@@ -1,6 +1,6 @@
 v0.3.0
 ======
-New framework for decorators
+New framework for decorators, see PR `#19 <https://github.com/Chilipp/docrep/pull/19>`__
 
 This release deprecates several methods of the :class:`DocstringProcessor` in
 favor of a more uniform framework. Functions such as `get_sections` and `dedent`
