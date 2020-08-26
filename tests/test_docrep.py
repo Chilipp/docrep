@@ -705,7 +705,7 @@ class DepreceationsTest(_BaseTest):
         joined_pdescs = '\n'.join(pdescs)
         ds = docrep.DocstringProcessor()
         with self.assertWarnsRegex(DeprecationWarning, 'keep_params_s'):
-            txt = ds.keep_params_s('\n'.join(all_pdescs), *params)
+            txt = ds.keep_params_s('\n'.join(all_pdescs), params)
         # check single
         self.assertEqual(txt, joined_pdescs,
                          msg='Wrong description for params {}'.format(params))
