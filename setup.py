@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='docrep',
-      version='0.2.8',
+      version='0.3.0.dev0',
       description='Python package for docstring repetition',
       long_description=readme(),
       classifiers=[
@@ -26,12 +26,13 @@ setup(name='docrep',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Operating System :: OS Independent',
       ],
       keywords='docstrings docs docstring napoleon numpy reStructured text',
       url='https://github.com/Chilipp/docrep',
-      author='Philipp Sommer',
-      author_email='philipp.sommer@unil.ch',
+      author='Philipp S. Sommer',
+      author_email='philipp.sommer@hzg.de',
       license="GPLv2",
       packages=find_packages(exclude=['docs', 'tests*', 'examples']),
       install_requires=[
@@ -40,4 +41,9 @@ setup(name='docrep',
       data_files=[("", ["LICENSE"])],
       setup_requires=pytest_runner,
       tests_require=['pytest'],
+      project_urls={
+         'Documentation': 'https://docrep.readthedocs.io',
+         'Source': 'https://github.com/Chilipp/docrep',
+         'Tracker': 'https://github.com/Chilipp/docrep/issues',
+      },
       zip_safe=False)

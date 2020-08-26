@@ -62,16 +62,19 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
-autodoc_default_flags = ['show_inheritance', 'autosummary',
-                         'show-formatoptions']
+autodoc_default_options = {
+    'show_inheritance': True,
+    'autosummary': True,
+}
+
 autoclass_content = 'both'
 
 ipython_savefig_dir = os.path.join(os.path.dirname(__file__), '_static')
 
 # General information about the project.
 project = u'docrep'
-copyright = u'2016, Philipp Sommer'
-author = u'Philipp Sommer'
+copyright = u'2016-2020, Philipp S. Sommer'
+author = u'Philipp S. Sommer'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -253,7 +256,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'docrep.tex', u'docrep Documentation',
-   u'Philipp Sommer', 'manual'),
+   u'Philipp S. Sommer', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -385,15 +388,31 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-    'matplotlib': ('http://matplotlib.org/', None),
-    'sphinx': ('http://www.sphinx-doc.org/en/stable/', None),
-    'xarray': ('http://xarray.pydata.org/en/stable/', None),
-    'cartopy': ('http://scitools.org.uk/cartopy/docs/latest/', None),
-    'mpl_toolkits': ('http://matplotlib.org/basemap/', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
 }
 if six.PY3:
-    intersphinx_mapping['python'] = ('https://docs.python.org/3.4/', None)
+    intersphinx_mapping['python'] = ('https://docs.python.org/3/', None)
 else:
     intersphinx_mapping['python'] = ('https://docs.python.org/2.7/', None)
+
+
+sections = {
+    'Updating Methods': ['dedent', 'with_indent'],
+    'Analysis Methods': ['get_sections', 'get_summary', 'get_extended_summary',
+                         'get_full_description', 'get_docstring'],
+    'Extraction Methods': ['delete_params', 'delete_kwargs', 'delete_types',
+                           'keep_params', 'keep_types']
+    }
+
+
+def group_docstring_processor_methods(app, what, name, obj, section, parent):
+    if parent is docrep.DocstringProcessor:
+        for section, vals in sections.items():
+            if name in vals:
+                return section
+    if obj.__doc__.strip().startswith("Deprecated"):
+        return "Deprecated Methods"
+
+
+def setup(app):
+    app.connect('autodocsumm-grouper', group_docstring_processor_methods)
