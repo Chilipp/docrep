@@ -221,6 +221,47 @@ example
 .. _`numpy conventions`: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
 
 
+The docrep workflow
+===================
+
+The general workflow is:
+
+1. Create an instance of the :class:`DocstringProcessor`::
+
+       >>> from docrep import DocstringProcessor
+       >>> docstrings = DocstringProcessor()
+
+2. Analyse the docstring of a function, class or method::
+
+       >>> @docstrings.get_sections
+       ... def my_function(...):
+       ...     """..."""
+
+   Available methods for analysing the docstring are:
+
+   .. autoclasssumm:: DocstringProcessor
+       :autosummary-sections: Analysis Methods
+       :autosummary-no-titles:
+
+3. Optionally process the docstring using one of the analysis methods
+
+   .. autoclasssumm:: DocstringProcessor
+       :autosummary-sections: Extraction Methods
+       :autosummary-no-titles:
+
+4. Reuse the docstring somewhere else with one of the update methods:
+
+   .. autoclasssumm:: DocstringProcessor
+       :autosummary-sections: Updating Methods
+       :autosummary-no-titles:
+
+   For instance via::
+
+       >>> @docstrings.dedent
+       ... def my_other_function(...):
+       ...     """..."""
+
+
 Installation
 =============
 Installation simply goes via pip::
