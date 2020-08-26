@@ -8,7 +8,7 @@ from docrep.decorators import (
     updates_docstring, reads_docstring, deprecated)
 
 
-__version__ = '0.3.0.dev0'
+__version__ = '0.3.0'
 
 __author__ = 'Philipp Sommer'
 
