@@ -1,3 +1,8 @@
+v0.3.1
+======
+Minor fix for internal deprecation
+
+
 v0.3.0
 ======
 New framework for decorators, see PR `#19 <https://github.com/Chilipp/docrep/pull/19>`__

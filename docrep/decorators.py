@@ -138,8 +138,6 @@ def deprecated(replacement, version, replace=True, replacement_name=None,
 
 
 def _set_object_doc(obj, doc, stacklevel=3, py2_class='warn'):
-    warn("The DocstringProcessor._set_object_doc method has been "
-         "depreceated.", DeprecationWarning)
     if isinstance(obj, types.MethodType) and six.PY2:
         obj = obj.im_func
     try:
