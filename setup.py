@@ -14,6 +14,7 @@ setup(name='docrep',
       version='0.3.2',
       description='Python package for docstring repetition',
       long_description=readme(),
+      long_description_content_type="text/x-rst",
       classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
