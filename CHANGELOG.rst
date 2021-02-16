@@ -1,3 +1,7 @@
+v0.3.2
+======
+Switch to Apache-2.0 license, see `#22 <https://github.com/Chilipp/docrep/pull/27>`__
+
 v0.3.1
 ======
 Minor fix for internal deprecation
