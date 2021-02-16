@@ -304,6 +304,67 @@ or from the source on github_ via::
     :attr:`DocstringProcessor.python2_classes` attribute.
 
 
+How to add custom sections
+======================
+
+`docrep` supports the standard sections from the `numpy docstring standard`_.
+
+You can however easily add your own section by subclassing the
+:class:`DocstringProcessor` class and implement your own
+:attr:`~DocstringProcessor.text_sections` and
+:attr:`~DocstringProcessor.param_like_sections`.
+
+The following example demonstrates this usage, we'll add a *Rules* that lists
+some rules when to apply this method
+
+.. ipython::
+
+    In [13]: from docrep import DocstringProcessor
+
+    In [13]: class RulesDocstringProcessor(DocstringProcessor):
+       ....:
+       ....:     param_like_sections = ["Rules"] + DocstringProcessor.param_like_sections
+
+    In [14]: d = RulesDocstringProcessor()
+
+    In [14]: @d.get_sections(base="increase", sections=["Parameters", "Rules"])
+       ....: def increase(b):
+       ....:     """Increase a number.
+       ....:
+       ....:     Parameters
+       ....:     ----------
+       ....:     b: int
+       ....:         The parameters to increase
+       ....:
+       ....:     Rules
+       ....:     -----
+       ....:     greater_0
+       ....:         The input parameter b must be greater than zero!
+       ....:     """
+       ....:     return b + 1
+
+    In [15]: @d.with_indent(4)
+       ....: def divide(a, b):
+       ....:     """Divide two numbers.
+       ....:
+       ....:     Parameters
+       ....:     ----------
+       ....:     a: int
+       ....:         The numerator
+       ....:     b: int
+       ....:         The denominator
+       ....:
+       ....:     Rules
+       ....:     -----
+       ....:     %(increase.rules)s
+       ....:     """
+       ....:     return a / b
+
+    In [16]: print(divide.__doc__)
+
+.. _numpy docstring standard: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+
+
 API Reference
 =============
 
